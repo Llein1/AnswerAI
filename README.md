@@ -180,14 +180,6 @@ const maxSize = 10 * 1024 * 1024
 - İnternet bağlantınızı kontrol edin
 - Aktif dosya sayısını azaltmayı deneyin
 
-## 📝 Lisans
-
-MIT Lisansı - Bu projeyi dilediğiniz gibi kullanabilirsiniz!
-
-## 🤝 Katkıda Bulunma
-
-Bu bir eğitim projesidir. Fork'layıp denemeler yapmaktan çekinmeyin!
-
 ---
 
-**React, Gemini AI ve modern web teknolojileri ile ❤️ kullanılarak geliştirildi**
+<sub>*Antigravity ile geliştirilmiştir.*</sub>

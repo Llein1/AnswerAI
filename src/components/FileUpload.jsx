@@ -9,11 +9,11 @@ export default function FileUpload({ onFileUpload }) {
         const maxSize = 10 * 1024 * 1024 // 10MB
 
         if (file.type !== 'application/pdf') {
-            throw new Error('Only PDF files are supported')
+            throw new Error('Sadece PDF dosyaları desteklenmektedir')
         }
 
         if (file.size > maxSize) {
-            throw new Error('File size must be less than 10MB')
+            throw new Error('Dosya boyutu 10MB\'dan küçük olmalıdır')
         }
 
         return true
@@ -81,15 +81,15 @@ export default function FileUpload({ onFileUpload }) {
                         {uploading ? (
                             <>
                                 <FileUp className="w-8 h-8 text-primary-400 animate-pulse" />
-                                <p className="text-sm text-gray-300">Uploading...</p>
+                                <p className="text-sm text-gray-300">Yükleniyor...</p>
                             </>
                         ) : (
                             <>
                                 <Upload className={`w-8 h-8 ${isDragging ? 'text-primary-400' : 'text-gray-400'}`} />
                                 <p className="text-sm text-gray-300">
-                                    <span className="text-primary-400 font-medium">Click to upload</span> or drag and drop
+                                    <span className="text-primary-400 font-medium">Dosya seçin</span> veya sürükleyip bırakın
                                 </p>
-                                <p className="text-xs text-gray-500">PDF files only (max 10MB)</p>
+                                <p className="text-xs text-gray-500">Sadece PDF (maks 10MB)</p>
                             </>
                         )}
                     </div>

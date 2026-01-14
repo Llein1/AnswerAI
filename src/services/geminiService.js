@@ -31,7 +31,7 @@ if (API_KEY) {
  */
 export async function createEmbedding(text) {
     if (!API_KEY) {
-        throw new Error('Gemini API key not configured. Please set VITE_GEMINI_API_KEY in .env file')
+        throw new Error('Gemini API anahtarı yapılandırılmamış. Lütfen .env dosyasında VITE_GEMINI_API_KEY ayarını kontrol edin')
     }
 
     try {
@@ -60,7 +60,7 @@ export async function createEmbedding(text) {
  */
 export async function generateResponse(prompt, context, documentMetadata = {}) {
     if (!chatModel) {
-        throw new Error('Gemini API key not configured. Please set VITE_GEMINI_API_KEY in .env file')
+        throw new Error('Gemini API anahtarı yapılandırılmamış. Lütfen .env dosyasında VITE_GEMINI_API_KEY ayarını kontrol edin')
     }
 
     try {
@@ -79,18 +79,18 @@ export async function generateResponse(prompt, context, documentMetadata = {}) {
         console.error('Generation error:', error)
 
         if (error.message?.includes('API key') || error.message?.includes('401')) {
-            throw new Error('Invalid API key. Please check your VITE_GEMINI_API_KEY')
+            throw new Error('Geçersiz API anahtarı. Lütfen VITE_GEMINI_API_KEY değerini kontrol edin')
         }
 
         if (error.message?.includes('quota') || error.message?.includes('429')) {
-            throw new Error('API quota exceeded. Please try again later')
+            throw new Error('API kotası aşıldı. Lütfen daha sonra tekrar deneyin')
         }
 
         if (error.message?.includes('404')) {
-            throw new Error('Model not found. Please verify your API key has access to Gemini models at https://aistudio.google.com/apikey')
+            throw new Error('Model bulunamadı. Lütfen API anahtarınızın Gemini modellerine erişimi olduğunu doğrulayın (https://aistudio.google.com/apikey)')
         }
 
-        throw new Error(`Failed to generate response: ${error.message}`)
+        throw new Error(`Cevap oluşturulamadı: ${error.message}`)
     }
 }
 
@@ -108,35 +108,36 @@ function buildRAGPrompt(context, question, documentMetadata = {}) {
     const comparisonKeywords = /compare|difference|contrast|versus|vs\.|which.*better|which.*more|both.*mention|similarities|distinctions/i
     const isComparisonQuery = comparisonKeywords.test(question)
 
-    let basePrompt = `You are a helpful AI assistant that answers questions based on the provided document context.`
+    let basePrompt = `Sen, sağlanan belge bağlamına dayalı olarak soruları cevaplayan yardımcı bir yapay zeka asistanısın.`
 
     // Add comparison-specific instructions for multi-document queries
     if (isComparisonQuery && activeFileCount > 1) {
-        basePrompt += `\n\n🔍 COMPARISON MODE ACTIVE:
-The user is asking to compare/contrast multiple documents: ${fileNames.join(', ')}.
+        basePrompt += `\n\n🔍 KARŞILAŞTIRMA MODU AKTİF:
+Kullanıcı birden fazla belgeyi karşılaştırmak/zıtlaştırmak istiyor: ${fileNames.join(', ')}.
 
-When answering comparison questions:
-- Explicitly state which information comes from which document
-- Highlight similarities AND differences
-- Use document names when referencing sources
-- Provide a comparative analysis, not just separate summaries
-- If one document has more detail on a topic, say so explicitly`
+Karşılaştırma sorularını cevaplarken:
+- Hangi bilginin hangi belgeden geldiğini açıkça belirt
+- Benzerlikleri VE farklılıkları vurgula
+- Kaynaklara atıfta bulunurken belge adlarını kullan
+- Sadece ayrı özetler değil, karşılaştırmalı bir analiz sun
+- Bir belge bir konuda daha fazla detaya sahipse, bunu açıkça belirt`
     }
 
     return `${basePrompt}
 
-CONTEXT FROM DOCUMENTS:
+BELGELERDEN BAĞLAM:
 ${context}
 
-USER QUESTION:
+KULLANICI SORUSU:
 ${question}
 
-INSTRUCTIONS:
-- Answer the question based ONLY on the information provided in the context above
-- If the answer cannot be found in the context, say "I cannot find this information in the provided documents"
-- Be concise but comprehensive
-- Use specific quotes or references when possible
-- If the question is unclear, ask for clarification
+TALİMATLAR:
+- Soruyu YALNIZCA yukarıdaki bağlamda sağlanan bilgilere dayanarak cevapla
+- Cevap bağlamda bulunamazsa, "Bu bilgi sağlanan belgelerde bulunamadı" de
+- Açık ve kapsamlı ol
+- Mümkün olduğunda belirli alıntılar veya referanslar kullan
+- Soru net değilse, açıklama iste
+- Cevabı Türkçe olarak ver
 
-ANSWER:`
+CEVAP:`
 }

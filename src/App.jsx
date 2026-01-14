@@ -49,7 +49,7 @@ function App() {
         if (activeConversationId && messages.length > 0) {
             const conversation = {
                 id: activeConversationId,
-                title: ConvStorage.loadConversation(activeConversationId)?.title || 'New Conversation',
+                title: ConvStorage.loadConversation(activeConversationId)?.title || 'Yeni Sohbet',
                 createdAt: ConvStorage.loadConversation(activeConversationId)?.createdAt || Date.now(),
                 updatedAt: Date.now(),
                 messages: messages,
@@ -115,7 +115,7 @@ function App() {
 
         const activeFiles = files.filter(f => f.active)
         if (activeFiles.length === 0) {
-            setError('Please upload and activate at least one file to start chatting.')
+            setError('Sohbete başlamak için lütfen en az bir dosya yükleyin ve aktifleştirin.')
             return
         }
 

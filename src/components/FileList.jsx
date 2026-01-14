@@ -17,7 +17,7 @@ export default function FileList({ files, onDelete, onToggle }) {
             <div className="flex-1 flex items-center justify-center p-4">
                 <div className="text-center text-gray-500">
                     <FileText className="w-12 h-12 mx-auto mb-2 opacity-30" />
-                    <p className="text-sm">No files uploaded</p>
+                    <p className="text-sm">Henüz dosya yüklenmedi</p>
                 </div>
             </div>
         )
@@ -26,7 +26,7 @@ export default function FileList({ files, onDelete, onToggle }) {
     return (
         <div className="flex-1 overflow-y-auto p-4">
             <h3 className="text-sm font-semibold text-gray-400 mb-3 uppercase tracking-wide">
-                Uploaded Files ({files.length})
+                Dosyalar ({files.length})
             </h3>
             <div className="space-y-2">
                 {files.map((file) => (
@@ -48,14 +48,14 @@ export default function FileList({ files, onDelete, onToggle }) {
                                 </p>
                                 <p className="text-xs text-gray-500 mt-1">
                                     {formatFileSize(file.size)}
-                                    {file.pageCount && ` · ${file.pageCount} page${file.pageCount > 1 ? 's' : ''}`}
+                                    {file.pageCount && ` · ${file.pageCount} sayfa`}
                                 </p>
                             </div>
                             <div className="flex items-center gap-1">
                                 <button
                                     onClick={() => onToggle(file.id)}
                                     className="p-1 hover:bg-slate-600 rounded transition-colors"
-                                    title={file.active ? 'Deactivate' : 'Activate'}
+                                    title={file.active ? 'Pasifleştir' : 'Aktifleştir'}
                                 >
                                     {file.active ? (
                                         <Eye className="w-4 h-4 text-primary-400" />
@@ -69,7 +69,7 @@ export default function FileList({ files, onDelete, onToggle }) {
                                         setDeleteDialogOpen(true)
                                     }}
                                     className="p-1 hover:bg-red-500/20 rounded transition-colors"
-                                    title="Delete file"
+                                    title="Dosyayı sil"
                                 >
                                     <Trash2 className="w-4 h-4 text-gray-400 hover:text-red-400" />
                                 </button>
@@ -82,8 +82,8 @@ export default function FileList({ files, onDelete, onToggle }) {
             {/* Delete Confirmation Dialog */}
             <ConfirmDialog
                 isOpen={deleteDialogOpen}
-                title="Delete File"
-                message="Are you sure you want to delete this file? This action cannot be undone."
+                title="Dosyayı Sil"
+                message="Bu dosyayı silmek istediğinize emin misiniz? Bu işlem geri alınamaz."
                 onConfirm={() => {
                     if (fileToDelete) {
                         onDelete(fileToDelete)

@@ -20,11 +20,11 @@ export default function ConversationList({
         const diffHours = Math.floor(diffMs / 3600000)
         const diffDays = Math.floor(diffMs / 86400000)
 
-        if (diffMins < 1) return 'Just now'
-        if (diffMins < 60) return `${diffMins}m ago`
-        if (diffHours < 24) return `${diffHours}h ago`
-        if (diffDays < 7) return `${diffDays}d ago`
-        return date.toLocaleDateString()
+        if (diffMins < 1) return 'Az önce'
+        if (diffMins < 60) return `${diffMins}dk önce`
+        if (diffHours < 24) return `${diffHours}sa önce`
+        if (diffDays < 7) return `${diffDays}g önce`
+        return date.toLocaleDateString('tr-TR')
     }
 
     return (
@@ -36,7 +36,7 @@ export default function ConversationList({
                     className="w-full bg-gradient-to-r from-primary-600 to-accent-600 hover:from-primary-700 hover:to-accent-700 text-white rounded-lg px-4 py-2.5 flex items-center justify-center gap-2 transition-all"
                 >
                     <Plus className="w-5 h-5" />
-                    <span className="font-medium">New Chat</span>
+                    <span className="font-medium">Yeni Sohbet</span>
                 </button>
             </div>
 
@@ -45,8 +45,8 @@ export default function ConversationList({
                 {conversations.length === 0 ? (
                     <div className="p-4 text-center text-gray-500">
                         <MessageSquare className="w-12 h-12 mx-auto mb-2 opacity-30" />
-                        <p className="text-sm">No conversations yet</p>
-                        <p className="text-xs mt-1">Start a new chat to begin</p>
+                        <p className="text-sm">Henüz sohbet yok</p>
+                        <p className="text-xs mt-1">Başlamak için yeni sohbet oluşturun</p>
                     </div>
                 ) : (
                     <div className="p-2 space-y-1">
@@ -54,8 +54,8 @@ export default function ConversationList({
                             <div
                                 key={conv.id}
                                 className={`group relative rounded-lg p-3 cursor-pointer transition-all ${activeId === conv.id
-                                        ? 'bg-primary-600/20 border border-primary-500/50'
-                                        : 'hover:bg-slate-700/50 border border-transparent'
+                                    ? 'bg-primary-600/20 border border-primary-500/50'
+                                    : 'hover:bg-slate-700/50 border border-transparent'
                                     }`}
                                 onClick={() => onSelect(conv.id)}
                             >
@@ -74,7 +74,7 @@ export default function ConversationList({
                                             </p>
                                             <span className="text-xs text-gray-600">•</span>
                                             <p className="text-xs text-gray-500">
-                                                {conv.messages.length} msg{conv.messages.length !== 1 ? 's' : ''}
+                                                {conv.messages.length} mesaj
                                             </p>
                                         </div>
                                     </div>
@@ -86,7 +86,7 @@ export default function ConversationList({
                                             setDeleteDialogOpen(true)
                                         }}
                                         className="opacity-0 group-hover:opacity-100 p-1 hover:bg-red-500/20 rounded transition-opacity"
-                                        title="Delete conversation"
+                                        title="Sohbeti sil"
                                     >
                                         <Trash2 className="w-4 h-4 text-gray-400 hover:text-red-400" />
                                     </button>
@@ -100,15 +100,15 @@ export default function ConversationList({
             {/* Footer info */}
             <div className="p-3 border-t border-slate-700">
                 <p className="text-xs text-gray-500 text-center">
-                    {conversations.length} conversation{conversations.length !== 1 ? 's' : ''}
+                    {conversations.length} sohbet
                 </p>
             </div>
 
             {/* Confirmation Dialog */}
             <ConfirmDialog
                 isOpen={deleteDialogOpen}
-                title="Delete Conversation"
-                message="Are you sure you want to delete this conversation? This action cannot be undone."
+                title="Sohbeti Sil"
+                message="Bu sohbeti silmek istediğinize emin misiniz? Bu işlem geri alınamaz."
                 onConfirm={() => {
                     if (conversationToDelete) {
                         onDelete(conversationToDelete)

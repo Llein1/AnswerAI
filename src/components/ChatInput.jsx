@@ -40,7 +40,7 @@ export default function ChatInput({ onSendMessage, disabled }) {
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={handleKeyDown}
-                    placeholder={disabled ? "Upload and activate a file to start chatting..." : "Ask a question about your documents..."}
+                    placeholder={disabled ? "Sohbete başlamak için dosya yükleyin ve aktifleştirin..." : "Dokümanlarınız hakkında soru sorun..."}
                     disabled={disabled}
                     rows={1}
                     className="flex-1 bg-slate-700 text-gray-200 placeholder-gray-500 rounded-lg px-4 py-3 resize-none focus:outline-none focus:ring-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed overflow-y-auto"
@@ -55,7 +55,7 @@ export default function ChatInput({ onSendMessage, disabled }) {
                 </button>
             </form>
             <p className="text-xs text-gray-500 mt-2">
-                Press Enter to send, Shift+Enter for new line
+                Göndermek için Enter, yeni satır için Shift+Enter
             </p>
         </div>
     )

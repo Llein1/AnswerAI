@@ -24,17 +24,17 @@ export default function ChatInterface({ messages, isLoading, error }) {
                 <div className="text-center max-w-md">
                     <FileQuestion className="w-16 h-16 mx-auto mb-4 text-primary-400/50" />
                     <h2 className="text-xl font-semibold text-gray-300 mb-2">
-                        Ready to Answer Your Questions
+                        Sorularınızı Cevaplamaya Hazır
                     </h2>
                     <p className="text-gray-500 mb-6">
-                        Upload a PDF document and start asking questions about its content.
+                        Bir PDF belgesi yükleyin ve içeriği hakkında sorular sormaya başlayın.
                     </p>
                     <div className="space-y-2 text-sm text-left bg-slate-800/50 rounded-lg p-4">
-                        <p className="text-gray-400 font-medium mb-2">Example questions:</p>
+                        <p className="text-gray-400 font-medium mb-2">Örnek sorular:</p>
                         <ul className="space-y-1 text-gray-500">
-                            <li>• "What is this document about?"</li>
-                            <li>• "Summarize the main points"</li>
-                            <li>• "What are the key findings?"</li>
+                            <li>• "Bu belge ne hakkında?"</li>
+                            <li>• "Ana noktaları özetle"</li>
+                            <li>• "Önemli bulgular neler?"</li>
                         </ul>
                     </div>
                 </div>
@@ -48,7 +48,7 @@ export default function ChatInterface({ messages, isLoading, error }) {
                 <div className="bg-red-500/10 border border-red-500/50 rounded-lg p-4 flex items-start gap-3 animate-fadeIn">
                     <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
                     <div>
-                        <p className="text-red-400 font-medium">Error</p>
+                        <p className="text-red-400 font-medium">Hata</p>
                         <p className="text-red-300 text-sm mt-1">{error}</p>
                     </div>
                 </div>
