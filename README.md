@@ -1,242 +1,193 @@
-# AnswerAI - Advanced RAG Chatbot 🤖
+# AnswerAI - Gelişmiş RAG Chatbot 🤖
 
-A modern, feature-rich RAG (Retrieval-Augmented Generation) chatbot with conversation memory, file persistence, and multi-document comparison capabilities. Built with React, Gemini AI, and modern web technologies.
+React, Gemini AI ve modern web teknolojileri ile geliştirilmiş; konuşma hafızası, dosya kalıcılığı ve çoklu belge karşılaştırma yeteneklerine sahip modern bir RAG (Retrieval-Augmented Generation) chatbot.
 
-![AnswerAI Demo](https://img.shields.io/badge/status-production%20ready-brightgreen)
+![AnswerAI Demo](assets/demo.png)
+
+![Durum](https://img.shields.io/badge/durum-production%20ready-brightgreen)
 ![React](https://img.shields.io/badge/React-18-blue)
 ![Gemini](https://img.shields.io/badge/Gemini-2.5%20Flash-orange)
 
-## ✨ Features
+## ✨ Özellikler
 
-### 📄 Document Management
-- **PDF Upload**: Drag & drop or click to upload PDF files (max 10MB)
-- **Multi-File Support**: Upload and manage multiple PDFs simultaneously
-- **File Persistence**: Uploaded files persist across page refreshes (localStorage)
-- **Active/Inactive Toggle**: Control which documents are used for Q&A
-- **File Metadata**: View page count, file size, and upload date
+### 📄 Belge Yönetimi
+- **PDF Yükleme**: Sürükle-bırak veya tıklayarak PDF yükleme (maks 10MB)
+- **Çoklu Dosya Desteği**: Aynı anda birden fazla PDF yükleyin ve yönetin
+- **Dosya Kalıcılığı**: Yüklenen dosyalar sayfa yenilense bile kaybolmaz (localStorage)
+- **Aktif/Pasif Kontrolü**: Hangi belgelerin sohbete dahil edileceğini seçin
+- **Dosya Detayları**: Sayfa sayısı, dosya boyutu ve yükleme tarihi bilgileri
 
-### 💬 Conversation Features
-- **Conversation Memory**: All chats automatically saved to localStorage
-- **Persistent History**: Conversations survive page refreshes
-- **Auto-Title Generation**: First message becomes conversation title
-- **Quick Switching**: Jump between saved conversations instantly
-- **Delete Protection**: Custom confirmation dialogs prevent accidental deletions
+### 💬 Konuşma Özellikleri
+- **Konuşma Hafızası**: Tüm sohbetler otomatik olarak localStorage'a kaydedilir
+- **Kalıcı Geçmiş**: Sayfa yenilendiğinde sohbetleriniz silinmez
+- **Otomatik Başlıklandırma**: İlk mesaja göre konuşma başlığı otomatik oluşturulur
+- **Hızlı Geçiş**: Kayıtlı konuşmalar arasında anında geçiş yapın
+- **Silme Koruması**: Yanlışlıkla silmeyi önlemek için özel onay kutuları
 
-### 🔍 Advanced RAG Capabilities
-- **Semantic Search**: Vector similarity search using Gemini embeddings
-- **Multi-Document QA**: Ask questions across multiple PDFs
-- **Document Comparison**: Smart detection of comparison queries
-  - "What are the differences between these documents?"
-  - "Which document discusses X in more detail?"
-  - "Do both documents mention Y?"
-- **Source Attribution**: See which document and page each answer came from
-- **Relevance Scoring**: Dynamic source selection based on similarity threshold
+### 🔍 Gelişmiş RAG Yetenekleri
+- **Semantik Arama**: Gemini embedding'leri ile vektör benzerlik araması
+- **Çoklu Belge Soru-Cevap**: Birden fazla PDF üzerinden soru sorun
+- **Belge Karşılaştırma**: Karşılaştırma sorularını akıllıca tespit eder
+  - "Bu iki belge arasındaki farklar neler?"
+  - "Hangi belgede X konusu daha detaylı anlatılıyor?"
+  - "Her iki belgede de Y'den bahsediliyor mu?"
+- **Kaynak Gösterimi**: Cevabın hangi belgenin kaçıncı sayfasından geldiğini görün
+- **Alaka Puanlaması**: Benzerlik eşiğine göre dinamik kaynak seçimi
 
-### 🎨 Modern UX
-- **Sticky Header**: Navigation always accessible at top
-- **Sticky Input**: Chat input always visible at bottom
-- **Independent Scrolling**: Separate scroll areas for conversations and files
-- **Markdown Rendering**: Rich text formatting in AI responses
-- **Copy to Clipboard**: One-click copy for AI responses
-- **Dark Theme**: Beautiful dark UI with glassmorphism effects
-- **Responsive Design**: Works seamlessly on desktop and mobile
+### 🎨 Modern Kullanıcı Deneyimi (UX)
+- **Sabit Başlık**: Navigasyon her zaman üstte erişilebilir
+- **Sabit Giriş**: Sohbet kutusu her zaman altta görünür
+- **Bağımsız Kaydırma**: Konuşmalar ve dosyalar için ayrı kaydırma alanları
+- **Markdown Desteği**: AI cevaplarında zengin metin biçimlendirmesi
+- **Tek Tıkla Kopyalama**: AI cevaplarını kolayca panoya kopyalayın
+- **Karanlık Tema**: Glassmorphism efektleriyle modern ve şık arayüz
+- **Mobil Uyumlu**: Masaüstü ve mobil cihazlarda sorunsuz çalışır
 
-## 🚀 Quick Start
+## 🚀 Hızlı Başlangıç
 
-### Prerequisites
+### Gereksinimler
 
-- Node.js 18+ installed
-- Google Gemini API key ([Get one here](https://aistudio.google.com/apikey))
+- Node.js 18+ yüklü olmalı
+- Google Gemini API anahtarı ([Buradan alabilirsiniz](https://aistudio.google.com/apikey))
 
-### Installation
+### Kurulum
 
-1. **Clone the repository**
+1. **Projeyi klonlayın**
    ```bash
-   git clone <your-repo-url>
+   git clone https://github.com/Llein1/AnswerAI.git
    cd AnswerAI
    ```
 
-2. **Install dependencies**
+2. **Bağımlılıkları yükleyin**
    ```bash
    npm install
    ```
 
-3. **Set up environment variables**
-   - Copy `.env.example` to `.env`
-   - Add your Gemini API key:
+3. **Çevresel değişkenleri ayarlayın**
+   - `.env.example` dosyasını `.env` olarak kopyalayın
+   - Gemini API anahtarınızı ekleyin:
    ```env
-   VITE_GEMINI_API_KEY=your_api_key_here
+   VITE_GEMINI_API_KEY=api_anahtariniz_buraya
    ```
 
-4. **Start the development server**
+4. **Geliştirme sunucusunu başlatın**
    ```bash
    npm run dev
    ```
 
-5. **Open your browser**
-   - Navigate to `http://localhost:5173`
+5. **Tarayıcınızı açın**
+   - `http://localhost:5173` adresine gidin
 
-## 📖 Usage
+## 📖 Kullanım
 
-### Basic Chat
-1. **Upload PDFs**: Click the upload area or drag & drop PDF files
-2. **Activate Files**: Ensure files are active (eye icon should be visible)
-3. **Ask Questions**: Type your question and press Enter
-4. **View Sources**: Click on source references to see which pages were used
+### Temel Sohbet
+1. **PDF Yükleyin**: Yükleme alanına tıklayın veya PDF dosyalarını sürükleyin
+2. **Dosyaları Aktifleştirin**: Göz ikonunun açık olduğundan emin olun
+3. **Soru Sorun**: Sorunuzu yazın ve Enter'a basın
+4. **Kaynakları İnceleyin**: Cevabın altındaki kaynaklara tıklayarak detayları görün
 
-### Multi-Document Comparison
-1. **Upload 2+ PDFs** and activate them
-2. **Ask comparison questions**:
-   - "Compare these two documents"
-   - "What are the main differences?"
-   - "Which document has more information about X?"
-3. **Get comparative analysis** with explicit document attribution
+### Çoklu Belge Karşılaştırma
+1. **2 veya daha fazla PDF yükleyin** ve aktifleştirin
+2. **Karşılaştırma soruları sorun**:
+   - "Bu belgeleri karşılaştır"
+   - "Temel farklar neler?"
+   - "X hakkında hangi belgede daha fazla bilgi var?"
+3. **Karşılaştırmalı analizi** ve belge referanslarını inceleyin
 
-### Conversation Management
-- **New Chat**: Click "New Chat" button to start fresh
-- **Switch Chats**: Click any conversation in the sidebar to load it
-- **Delete Chat**: Hover over conversation and click trash icon (with confirmation)
+### Konuşma Yönetimi
+- **Yeni Sohbet**: Temiz bir sayfa açmak için "New Chat" butonuna tıklayın
+- **Sohbet Değiştir**: Yan menüden eski konuşmalarınıza tıklayın
+- **Sohbet Sil**: Çöp kutusu ikonuna tıklayın ve onaylayın
 
-## 🛠️ Technology Stack
+## 🛠️ Teknoloji Yığını
 
-| Category | Technology |
+| Kategori | Teknoloji |
 |----------|-----------|
 | **Frontend** | React 18 + Vite |
-| **Styling** | Tailwind CSS |
-| **PDF Processing** | PDF.js (Mozilla) |
+| **Stil** | Tailwind CSS |
+| **PDF İşleme** | PDF.js (Mozilla) |
 | **AI/LLM** | Google Gemini 2.5 Flash |
 | **Embeddings** | Gemini text-embedding-004 |
-| **RAG Pipeline** | Custom vector similarity search |
-| **State Management** | React Hooks + localStorage |
-| **Icons** | Lucide React |
+| **RAG Pipeline** | Özel vektör benzerlik araması |
+| **State Yönetimi** | React Hooks + localStorage |
+| **İkonlar** | Lucide React |
 | **Markdown** | React Markdown + remark-gfm |
 
-## 📁 Project Structure
+## 📁 Proje Yapısı
 
 ```
 AnswerAI/
 ├── src/
 │   ├── components/
-│   │   ├── Layout.jsx              # App layout container
-│   │   ├── Header.jsx              # Sticky header with controls
-│   │   ├── FileUpload.jsx          # PDF upload interface
-│   │   ├── FileList.jsx            # File management list
-│   │   ├── ChatInterface.jsx       # Message display area
-│   │   ├── ChatInput.jsx           # Chat input with auto-resize
-│   │   ├── ConversationList.jsx    # Saved conversations sidebar
-│   │   ├── ConfirmDialog.jsx       # Custom confirmation modal
-│   │   ├── CopyButton.jsx          # Copy-to-clipboard button
-│   │   └── SourceReferences.jsx    # Source citation display
+│   │   ├── Layout.jsx              # Ana düzen
+│   │   ├── Header.jsx              # Sabit başlık
+│   │   ├── FileUpload.jsx          # PDF yükleme alanı
+│   │   ├── FileList.jsx            # Dosya listesi
+│   │   ├── ChatInterface.jsx       # Mesaj alanı
+│   │   ├── ChatInput.jsx           # Mesaj giriş kutusu
+│   │   ├── ConversationList.jsx    # Sohbet geçmişi listesi
+│   │   ├── ConfirmDialog.jsx       # Onay modalı
+│   │   ├── CopyButton.jsx          # Kopyalama butonu
+│   │   └── SourceReferences.jsx    # Kaynak gösterimi
 │   ├── services/
-│   │   ├── pdfService.js           # PDF text extraction
-│   │   ├── geminiService.js        # Gemini API integration
-│   │   ├── ragService.js           # RAG pipeline & vector search
-│   │   ├── conversationStorage.js  # Conversation persistence
-│   │   └── fileStorage.js          # File persistence
-│   ├── App.jsx                     # Main application
-│   ├── main.jsx                    # Entry point
-│   └── index.css                   # Global styles
-├── .env.example                    # Environment template
-├── package.json                    # Dependencies
-└── README.md                       # This file
+│   │   ├── pdfService.js           # PDF metin çıkarma
+│   │   ├── geminiService.js        # Gemini API entegrasyonu
+│   │   ├── ragService.js           # RAG ve vektör arama
+│   │   ├── conversationStorage.js  # Konuşma kaydetme
+│   │   └── fileStorage.js          # Dosya kaydetme
+│   ├── App.jsx                     # Ana uygulama
+│   ├── main.jsx                    # Giriş noktası
+│   └── index.css                   # Global stiller
+├── .env.example                    # Örnek env dosyası
+├── package.json                    # Bağımlılıklar
+└── README.md                       # Bu dosya
 ```
 
-## 🔧 Configuration
+## 🔧 Yapılandırma
 
-### RAG Parameters
+### RAG Parametreleri
 
-**Chunk Size** (default: 1000 characters, 200 overlap)
+**Chunk Boyutu** (varsayılan: 1000 karakter, 200 örtüşme)
 ```javascript
 // src/services/ragService.js
 splitTextIntoChunks(text, chunkSize = 1000, overlap = 200)
 ```
 
-**Similarity Threshold** (default: 0.4)
+**Benzerlik Eşiği** (varsayılan: 0.4)
 ```javascript
 // src/services/ragService.js
 retrieveContext(query, activeFileIds, minSimilarity = 0.4)
 ```
 
-**File Size Limit** (default: 10MB)
+**Dosya Boyut Limiti** (varsayılan: 10MB)
 ```javascript
 // src/services/pdfService.js
 const maxSize = 10 * 1024 * 1024
 ```
 
-### Storage Limits
+## 🐛 Sorun Giderme
 
-- **localStorage** is used for both conversations and files
-- Typical limit: ~5-10MB per domain
-- For very large PDFs, consider upgrading to IndexedDB
+### "API key not configured" hatası
+- `.env` dosyasının oluşturulduğundan emin olun
+- `VITE_` ön ekinin kullanıldığını kontrol edin
+- Sunucuyu yeniden başlatın
 
-## 🧪 Testing
+### PDF yükleme hatası
+- Dosyanın geçerli bir PDF olduğunu kontrol edin (taranmış resim olmamalı)
+- Dosya boyutunun 10MB altında olduğunu doğrulayın
 
-The app has been tested with:
-- ✅ Single and multiple PDF uploads
-- ✅ Conversation persistence across refreshes
-- ✅ File persistence across refreshes
-- ✅ Multi-document comparison queries
-- ✅ Sticky UI elements during scrolling
-- ✅ Delete confirmations for conversations and files
+### Yavaş cevap süreleri
+- İnternet bağlantınızı kontrol edin
+- Aktif dosya sayısını azaltmayı deneyin
 
-## 🐛 Troubleshooting
+## 📝 Lisans
 
-### "API key not configured" error
-- Verify `.env` file exists in project root
-- Check `VITE_` prefix is included
-- Restart dev server after adding key
+MIT Lisansı - Bu projeyi dilediğiniz gibi kullanabilirsiniz!
 
-### PDF upload fails
-- Ensure file is valid PDF (not scanned image)
-- Check file size is under 10MB
-- Try different PDF file
+## 🤝 Katkıda Bulunma
 
-### Slow response times
-- Check internet connection
-- Gemini API may have rate limits
-- Reduce number of active files
-
-### Files/conversations lost
-- Check browser's localStorage is enabled
-- Verify you're using the same browser
-- Check browser console for quota errors
-
-## 📝 Development Phases
-
-- ✅ **Phase 1**: Basic RAG pipeline
-- ✅ **Phase 2**: PDF processing & vector search
-- ✅ **Phase 3**: UX improvements (Markdown, copy button, source refs)
-- ✅ **Phase 4**: Advanced features (Current)
-  - Conversation memory
-  - File persistence
-  - Layout improvements (sticky header/input)
-  - Multi-document comparison
-
-## 🎯 Roadmap
-
-- [ ] Document preview with PDF.js viewer
-- [ ] Advanced search within conversations
-- [ ] Light/dark theme toggle
-- [ ] Export conversations to markdown
-- [ ] Multi-language support
-
-## 📄 License
-
-MIT License - feel free to use this project however you'd like!
-
-## 🤝 Contributing
-
-Contributions, issues, and feature requests are welcome! This is an educational project showcasing modern RAG implementation.
-
-## 🙏 Acknowledgments
-
-- Google Gemini AI for powerful language models
-- Mozilla PDF.js for PDF processing
-- React and Vite communities
-- Tailwind CSS for rapid UI development
+Bu bir eğitim projesidir. Fork'layıp denemeler yapmaktan çekinmeyin!
 
 ---
 
-**Built with ❤️ using React, Gemini AI, and modern web technologies**
-
-*For questions or support, please open an issue on GitHub*
+**React, Gemini AI ve modern web teknolojileri ile ❤️ kullanılarak geliştirildi**
