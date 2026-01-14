@@ -6,6 +6,7 @@ import FileList from './components/FileList'
 import ChatInterface from './components/ChatInterface'
 import ChatInput from './components/ChatInput'
 import ConversationList from './components/ConversationList'
+import ConfirmDialog from './components/ConfirmDialog'
 import { extractTextFromPDF } from './services/pdfService'
 import { generateRAGResponse } from './services/ragService'
 import * as ConvStorage from './services/conversationStorage'
@@ -21,6 +22,7 @@ function App() {
     // Conversation management
     const [conversations, setConversations] = useState([])
     const [activeConversationId, setActiveConversationId] = useState(null)
+    const [clearChatDialogOpen, setClearChatDialogOpen] = useState(false)
 
     // Load conversations and files on mount
     useEffect(() => {
@@ -151,8 +153,22 @@ function App() {
     }
 
     const handleClearChat = () => {
-        setMessages([])
-        setError(null)
+        setClearChatDialogOpen(true)
+    }
+
+    const confirmClearChat = () => {
+        if (activeConversationId) {
+            // Delete the current conversation from storage
+            ConvStorage.deleteConversation(activeConversationId)
+
+            // Create a new empty conversation
+            const newConv = ConvStorage.createNewConversation()
+            setActiveConversationId(newConv.id)
+            setMessages([])
+            setError(null)
+            setConversations(ConvStorage.getConversationsInOrder())
+        }
+        setClearChatDialogOpen(false)
     }
 
     // Conversation handlers
@@ -265,6 +281,15 @@ function App() {
                     </div>
                 </div>
             </div>
+
+            {/* Clear Chat Confirmation Dialog */}
+            <ConfirmDialog
+                isOpen={clearChatDialogOpen}
+                title="Sohbeti Temizle"
+                message="Bu sohbetteki tüm mesajları silmek istediğinize emin misiniz? Bu işlem geri alınamaz."
+                onConfirm={confirmClearChat}
+                onCancel={() => setClearChatDialogOpen(false)}
+            />
         </Layout>
     )
 }
