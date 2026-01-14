@@ -68,7 +68,7 @@ function saveConversationOrder(order) {
 /**
  * Create a new conversation
  */
-export function createNewConversation(title = 'New Conversation') {
+export function createNewConversation(title = 'Yeni Sohbet') {
     const conversation = {
         id: generateId(),
         title: title,
@@ -106,7 +106,7 @@ export function saveConversation(conversation) {
     conversation.updatedAt = Date.now()
 
     // Auto-generate title from first user message if still default
-    if (conversation.title === 'New Conversation' && conversation.messages.length > 0) {
+    if (conversation.title === 'Yeni Sohbet' && conversation.messages.length > 0) {
         const firstUserMsg = conversation.messages.find(m => m.role === 'user')
         if (firstUserMsg) {
             conversation.title = firstUserMsg.content.substring(0, 50) +
