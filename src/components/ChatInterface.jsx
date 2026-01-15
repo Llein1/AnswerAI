@@ -54,10 +54,11 @@ export default function ChatInterface({ messages, isLoading, error, onPageClick 
                 </div>
             )}
 
-            {messages.map((message) => (
+            {messages.map((message, index) => (
                 <div
                     key={message.id}
-                    className={`flex gap-3 animate-fadeIn ${message.role === 'user' ? 'justify-end' : 'justify-start'
+                    data-message-index={index}
+                    className={`flex gap-3 animate-fadeIn transition-all rounded-lg ${message.role === 'user' ? 'justify-end' : 'justify-start'
                         }`}
                 >
                     {message.role === 'assistant' && (

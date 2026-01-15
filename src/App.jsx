@@ -8,11 +8,13 @@ import ChatInput from './components/ChatInput'
 import ConversationList from './components/ConversationList'
 import ConfirmDialog from './components/ConfirmDialog'
 import PDFViewer from './components/PDFViewer'
+import SearchResults from './components/SearchResults'
 import { ChevronDown } from 'lucide-react'
 import { extractTextFromPDF } from './services/pdfService'
 import { generateRAGResponse } from './services/ragService'
 import * as ConvStorage from './services/conversationStorage'
 import * as FileStorage from './services/fileStorage'
+import { searchConversations, debounce, invalidateSearchCache } from './services/searchService'
 
 function App() {
     const [files, setFiles] = useState([])
@@ -33,6 +35,19 @@ function App() {
     // Scroll to bottom state and ref
     const chatScrollRef = useRef(null)
     const [showScrollButton, setShowScrollButton] = useState(false)
+
+    // Search state
+    const [searchQuery, setSearchQuery] = useState('')
+    const [searchResults, setSearchResults] = useState([])
+    const [selectedResultIndex, setSelectedResultIndex] = useState(0)
+    const searchContainerRef = useRef(null)
+    const [searchFilters, setSearchFilters] = useState({
+        dateRange: 'all',
+        customDateFrom: null,
+        customDateTo: null,
+        conversationIds: [],
+        messageType: 'all'
+    })
 
     // Load conversations and files on mount
     useEffect(() => {
@@ -68,6 +83,9 @@ function App() {
                 activeFileIds: files.filter(f => f.active).map(f => f.id)
             }
             ConvStorage.saveConversation(conversation)
+
+            // Invalidate search cache when conversations change
+            invalidateSearchCache()
 
             // Refresh conversation list
             setConversations(ConvStorage.getConversationsInOrder())
@@ -207,6 +225,10 @@ function App() {
 
     const handleDeleteConversation = (id) => {
         ConvStorage.deleteConversation(id)
+
+        // Invalidate search cache when conversations are deleted
+        invalidateSearchCache()
+
         const remainingConvs = ConvStorage.getConversationsInOrder()
         setConversations(remainingConvs)
 
@@ -256,6 +278,124 @@ function App() {
         }
     }
 
+    // Search handlers
+    const handleSearch = debounce((query) => {
+        if (!query || !query.trim()) {
+            setSearchResults([])
+            setSearchQuery('')
+            return
+        }
+
+        setSearchQuery(query)
+        const results = searchConversations(query, searchFilters)
+        setSearchResults(results)
+        setSelectedResultIndex(0)
+    }, 300)
+
+
+    const handleClearSearch = () => {
+        setSearchQuery('')
+        setSearchResults([])
+        setSelectedResultIndex(0)
+    }
+
+    // Close dropdown only (keep query text) - for click outside
+    const handleCloseSearchResults = () => {
+        setSearchResults([])
+        setSelectedResultIndex(0)
+    }
+
+    // Filter handlers
+    const handleFilterChange = (newFilters) => {
+        setSearchFilters(newFilters)
+        // Re-run search with new filters if query exists
+        if (searchQuery) {
+            const results = searchConversations(searchQuery, newFilters)
+            setSearchResults(results)
+            setSelectedResultIndex(0)
+        }
+    }
+
+    const handleClearFilters = () => {
+        const defaultFilters = {
+            dateRange: 'all',
+            customDateFrom: null,
+            customDateTo: null,
+            conversationIds: [],
+            messageType: 'all'
+        }
+        setSearchFilters(defaultFilters)
+        // Re-run search with cleared filters
+        if (searchQuery) {
+            const results = searchConversations(searchQuery, defaultFilters)
+            setSearchResults(results)
+            setSelectedResultIndex(0)
+        }
+    }
+
+    const handleSelectSearchResult = (result) => {
+        // Switch to the conversation containing the result
+        if (result.conversationId !== activeConversationId) {
+            loadConversation(result.conversationId)
+        }
+
+        // Wait for conversation to load, then scroll to message
+        setTimeout(() => {
+            const messageElements = document.querySelectorAll('[data-message-index]')
+            const targetElement = Array.from(messageElements).find(
+                el => parseInt(el.getAttribute('data-message-index')) === result.messageIndex
+            )
+
+            if (targetElement) {
+                targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                // Add temporary highlight
+                targetElement.classList.add('bg-primary-500/20', 'ring-2', 'ring-primary-500/50')
+                setTimeout(() => {
+                    targetElement.classList.remove('bg-primary-500/20', 'ring-2', 'ring-primary-500/50')
+                }, 2000)
+            }
+        }, 100)
+
+        // Keep search open so user can navigate to other results
+    }
+
+    // Keyboard navigation for search results
+    useEffect(() => {
+        if (searchResults.length === 0) return
+
+        const handleKeyDown = (e) => {
+            if (e.key === 'ArrowDown') {
+                e.preventDefault()
+                setSelectedResultIndex(prev =>
+                    prev < searchResults.length - 1 ? prev + 1 : prev
+                )
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault()
+                setSelectedResultIndex(prev => prev > 0 ? prev - 1 : 0)
+            } else if (e.key === 'Enter' && searchResults[selectedResultIndex]) {
+                e.preventDefault()
+                handleSelectSearchResult(searchResults[selectedResultIndex])
+            }
+        }
+
+        window.addEventListener('keydown', handleKeyDown)
+        return () => window.removeEventListener('keydown', handleKeyDown)
+    }, [searchResults, selectedResultIndex])
+
+    // Click outside to close search results
+    useEffect(() => {
+        if (searchResults.length === 0) return
+
+        const handleClickOutside = (e) => {
+            if (searchContainerRef.current && !searchContainerRef.current.contains(e.target)) {
+                handleCloseSearchResults()
+            }
+        }
+
+        document.addEventListener('mousedown', handleClickOutside)
+        return () => document.removeEventListener('mousedown', handleClickOutside)
+    }, [searchResults.length])
+
     // Scroll to bottom handler
     const scrollToBottom = () => {
         if (chatScrollRef.current) {
@@ -285,7 +425,31 @@ function App() {
         <Layout>
             {/* Sticky Header */}
             <div className="sticky top-0 z-20 bg-slate-900/95 backdrop-blur-sm border-b border-slate-700">
-                <Header onClearChat={handleClearChat} messageCount={messages.length} />
+                <div className="relative" ref={searchContainerRef}>
+                    <Header
+                        onClearChat={handleClearChat}
+                        messageCount={messages.length}
+                        onSearch={handleSearch}
+                        onClearSearch={handleClearSearch}
+                        searchResultCount={searchResults.length}
+                        searchFilters={searchFilters}
+                        conversations={conversations}
+                        onFilterChange={handleFilterChange}
+                        onClearFilters={handleClearFilters}
+                    />
+
+                    {/* Search Results Dropdown */}
+                    {searchQuery && searchResults.length > 0 && (
+                        <div className="absolute left-1/2 -translate-x-1/2 top-full w-full max-w-2xl px-6">
+                            <SearchResults
+                                results={searchResults}
+                                query={searchQuery}
+                                onSelectResult={handleSelectSearchResult}
+                                selectedIndex={selectedResultIndex}
+                            />
+                        </div>
+                    )}
+                </div>
             </div>
 
             <div className="flex-1 flex h-0 overflow-hidden relative">
