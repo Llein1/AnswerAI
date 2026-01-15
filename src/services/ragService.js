@@ -1,4 +1,5 @@
 import { createEmbedding, generateResponse } from './geminiService'
+import { getCachedChunks, setCachedChunks } from './chunkCacheService'
 
 // In-memory vector store
 let documentChunks = []
@@ -57,6 +58,16 @@ function cosineSimilarity(vecA, vecB) {
  */
 export async function processDocument(text, fileId, fileName, pages = []) {
     try {
+        // Check cache first
+        const cachedChunks = getCachedChunks(fileId, 1000, 200)
+        if (cachedChunks && cachedChunks.length > 0) {
+            console.log(`✅ Using cached chunks for ${fileName} (${cachedChunks.length} chunks)`)
+            // Replace existing chunks from this file
+            documentChunks = documentChunks.filter(chunk => chunk.fileId !== fileId)
+            documentChunks.push(...cachedChunks)
+            return cachedChunks.length
+        }
+
         // Split into chunks
         const chunks = splitTextIntoChunks(text)
 
@@ -123,6 +134,9 @@ export async function processDocument(text, fileId, fileName, pages = []) {
         // Add to vector store (replace existing chunks from this file)
         documentChunks = documentChunks.filter(chunk => chunk.fileId !== fileId)
         documentChunks.push(...processedChunks)
+
+        // Cache the processed chunks
+        setCachedChunks(fileId, processedChunks, 1000, 200)
 
         console.log(`✅ Processed ${processedChunks.length} chunks with embeddings`)
 

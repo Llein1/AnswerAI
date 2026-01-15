@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { FileText, Trash2, Eye, EyeOff, ExternalLink } from 'lucide-react'
 import ConfirmDialog from './ConfirmDialog'
+import { getFileTypeLabel } from '../services/fileProcessingService'
 
 export default function FileList({ files, onDelete, onToggle, onPreview }) {
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
@@ -43,9 +44,18 @@ export default function FileList({ files, onDelete, onToggle, onPreview }) {
                         <div className="flex items-start gap-2">
                             <FileText className={`w-5 h-5 flex-shrink-0 mt-0.5 ${file.active ? 'text-primary-400' : 'text-gray-500'}`} />
                             <div className="flex-1 min-w-0">
-                                <p className={`text-sm font-medium truncate ${file.active ? 'text-gray-200' : 'text-gray-400'}`}>
-                                    {file.name}
-                                </p>
+                                <div className="flex items-center gap-2">
+                                    <p className={`text-sm font-medium truncate ${file.active ? 'text-gray-200' : 'text-gray-400'}`}>
+                                        {file.name}
+                                    </p>
+                                    {/* File Type Badge */}
+                                    <span className={`text-xs px-1.5 py-0.5 rounded font-medium ${getFileTypeLabel(file.name) === 'PDF' ? 'bg-red-500/20 text-red-300' :
+                                            getFileTypeLabel(file.name) === 'DOCX' ? 'bg-blue-500/20 text-blue-300' :
+                                                'bg-gray-500/20 text-gray-300'
+                                        }`}>
+                                        {getFileTypeLabel(file.name)}
+                                    </span>
+                                </div>
                                 <p className="text-xs text-gray-500 mt-1">
                                     {formatFileSize(file.size)}
                                     {file.pageCount && ` · ${file.pageCount} sayfa`}

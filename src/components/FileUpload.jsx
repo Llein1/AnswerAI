@@ -5,24 +5,9 @@ export default function FileUpload({ onFileUpload }) {
     const [isDragging, setIsDragging] = useState(false)
     const [uploading, setUploading] = useState(false)
 
-    const validateFile = (file) => {
-        const maxSize = 10 * 1024 * 1024 // 10MB
-
-        if (file.type !== 'application/pdf') {
-            throw new Error('Sadece PDF dosyaları desteklenmektedir')
-        }
-
-        if (file.size > maxSize) {
-            throw new Error('Dosya boyutu 10MB\'dan küçük olmalıdır')
-        }
-
-        return true
-    }
-
     const handleFile = async (file) => {
         try {
             setUploading(true)
-            validateFile(file)
             await onFileUpload(file)
         } catch (error) {
             alert(error.message)
@@ -69,7 +54,7 @@ export default function FileUpload({ onFileUpload }) {
             >
                 <input
                     type="file"
-                    accept=".pdf"
+                    accept=".pdf,.docx"
                     onChange={handleFileInput}
                     className="hidden"
                     id="file-upload"
@@ -89,7 +74,7 @@ export default function FileUpload({ onFileUpload }) {
                                 <p className="text-sm text-gray-300">
                                     <span className="text-primary-400 font-medium">Dosya seçin</span> veya sürükleyip bırakın
                                 </p>
-                                <p className="text-xs text-gray-500">Sadece PDF (maks 10MB)</p>
+                                <p className="text-xs text-gray-500">PDF, DOCX (maks 10MB)</p>
                             </>
                         )}
                     </div>

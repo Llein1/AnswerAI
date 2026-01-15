@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, lazy, Suspense } from 'react'
+import ErrorBoundary from './components/ErrorBoundary'
 import Layout from './components/Layout'
 import Header from './components/Header'
 import FileUpload from './components/FileUpload'
@@ -7,10 +8,12 @@ import ChatInterface from './components/ChatInterface'
 import ChatInput from './components/ChatInput'
 import ConversationList from './components/ConversationList'
 import ConfirmDialog from './components/ConfirmDialog'
-import PDFViewer from './components/PDFViewer'
+// Lazy load viewers to reduce initial bundle size
+const PDFViewer = lazy(() => import('./components/PDFViewer'))
+const DOCXViewer = lazy(() => import('./components/DOCXViewer'))
 import SearchResults from './components/SearchResults'
 import { ChevronDown } from 'lucide-react'
-import { extractTextFromPDF } from './services/pdfService'
+import { processFile } from './services/fileProcessingService'
 import { generateRAGResponse } from './services/ragService'
 import * as ConvStorage from './services/conversationStorage'
 import * as FileStorage from './services/fileStorage'
@@ -95,19 +98,22 @@ function App() {
     const handleFileUpload = async (file) => {
         try {
             setError(null)
-            const { text, pageCount, pages } = await extractTextFromPDF(file)
 
-            // Read file as ArrayBuffer for preview
+            // Process file using unified service (supports PDF, TXT, MD, DOCX)
+            const { text, metadata } = await processFile(file)
+
+            // Read file as ArrayBuffer for preview (primarily for PDFs)
             const arrayBuffer = await file.arrayBuffer()
 
             const newFile = {
                 id: Date.now().toString(),
                 name: file.name,
                 size: file.size,
+                type: metadata.type, // Store file type (pdf, txt, md, docx)
                 text: text,
-                pageCount: pageCount,
-                pages: pages,  // Add pages metadata
-                data: arrayBuffer,  // Add binary data for preview
+                pageCount: metadata.pageCount || null, // PDF specific
+                pages: metadata.pages || null,  // PDF specific
+                data: arrayBuffer,  // Binary data for preview
                 active: true,
                 uploadedAt: new Date().toISOString()
             }
@@ -532,27 +538,71 @@ function App() {
                     )}
                 </div>
 
-                {/* PDF Preview Panel */}
+                {/* Document Preview Panel (PDF or DOCX) */}
                 {previewFile && (
                     <div className="absolute right-0 top-0 bottom-0 w-96 overflow-hidden flex flex-col hidden lg:flex">
-                        <PDFViewer
-                            fileData={previewFile.data}
-                            fileName={previewFile.name}
-                            initialPage={previewPage}
-                            onClose={handleClosePreview}
-                        />
+                        <ErrorBoundary fallback={
+                            <div className="flex items-center justify-center h-full bg-slate-900/95 p-6 text-center">
+                                <div>
+                                    <p className="text-gray-300 mb-4">Görüntüleme hatası</p>
+                                    <button
+                                        onClick={handleClosePreview}
+                                        className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-gray-300 rounded-lg"
+                                    >
+                                        Kapat
+                                    </button>
+                                </div>
+                            </div>
+                        }>
+                            <Suspense fallback={
+                                <div className="flex items-center justify-center h-full bg-slate-900/95">
+                                    <div className="text-gray-400">Görüntüleyici yükleniyor...</div>
+                                </div>
+                            }>
+                                {previewFile.type === 'pdf' ? (
+                                    <PDFViewer
+                                        fileData={previewFile.data}
+                                        fileName={previewFile.name}
+                                        initialPage={previewPage}
+                                        onClose={handleClosePreview}
+                                    />
+                                ) : previewFile.type === 'docx' ? (
+                                    <DOCXViewer
+                                        fileData={previewFile.data}
+                                        fileName={previewFile.name}
+                                        onClose={handleClosePreview}
+                                    />
+                                ) : null}
+                            </Suspense>
+                        </ErrorBoundary>
                     </div>
                 )}
 
                 {/* Mobile Preview Modal */}
                 {previewFile && (
                     <div className="lg:hidden fixed inset-0 z-50 bg-slate-900">
-                        <PDFViewer
-                            fileData={previewFile.data}
-                            fileName={previewFile.name}
-                            initialPage={previewPage}
-                            onClose={handleClosePreview}
-                        />
+                        <ErrorBoundary>
+                            <Suspense fallback={
+                                <div className="flex items-center justify-center h-full">
+                                    <div className="text-gray-400">Görüntüleyici yükleniyor...</div>
+                                </div>
+                            }>
+                                {previewFile.type === 'pdf' ? (
+                                    <PDFViewer
+                                        fileData={previewFile.data}
+                                        fileName={previewFile.name}
+                                        initialPage={previewPage}
+                                        onClose={handleClosePreview}
+                                    />
+                                ) : previewFile.type === 'docx' ? (
+                                    <DOCXViewer
+                                        fileData={previewFile.data}
+                                        fileName={previewFile.name}
+                                        onClose={handleClosePreview}
+                                    />
+                                ) : null}
+                            </Suspense>
+                        </ErrorBoundary>
                     </div>
                 )}
             </div>
