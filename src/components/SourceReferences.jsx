@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { ChevronDown, ChevronUp, FileText } from 'lucide-react'
 
-export default function SourceReferences({ sources }) {
+export default function SourceReferences({ sources, onPageClick }) {
     const [expanded, setExpanded] = useState(false)
 
     if (!sources || sources.length === 0) return null
@@ -72,7 +72,17 @@ export default function SourceReferences({ sources }) {
                                 </div>
                                 {pageInfo && (
                                     <div className="text-xs text-gray-400">
-                                        {pageInfo}
+                                        {onPageClick && source.pageNumbers && source.pageNumbers.length > 0 ? (
+                                            <button
+                                                onClick={() => onPageClick(source.fileName, source.pageNumbers[0])}
+                                                className="hover:text-primary-400 hover:underline transition-colors"
+                                                title="Bu sayfayı önizle"
+                                            >
+                                                {pageInfo}
+                                            </button>
+                                        ) : (
+                                            pageInfo
+                                        )}
                                     </div>
                                 )}
                             </div>

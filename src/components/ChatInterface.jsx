@@ -7,7 +7,7 @@ import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism'
 import CopyButton from './CopyButton'
 import SourceReferences from './SourceReferences'
 
-export default function ChatInterface({ messages, isLoading, error }) {
+export default function ChatInterface({ messages, isLoading, error, onPageClick }) {
     const messagesEndRef = useRef(null)
 
     const scrollToBottom = () => {
@@ -111,7 +111,7 @@ export default function ChatInterface({ messages, isLoading, error }) {
                             <CopyButton text={message.content} />
                         </div>
                         {message.role === 'assistant' && message.sources && (
-                            <SourceReferences sources={message.sources} />
+                            <SourceReferences sources={message.sources} onPageClick={onPageClick} />
                         )}
                     </div>
 

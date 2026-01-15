@@ -6,6 +6,34 @@
 const FILES_STORAGE_KEY = 'answerai_files'
 
 /**
+ * Convert ArrayBuffer to Base64 string
+ * @param {ArrayBuffer} buffer - ArrayBuffer to convert
+ * @returns {string} Base64 string
+ */
+function arrayBufferToBase64(buffer) {
+    const bytes = new Uint8Array(buffer)
+    let binary = ''
+    for (let i = 0; i < bytes.byteLength; i++) {
+        binary += String.fromCharCode(bytes[i])
+    }
+    return btoa(binary)
+}
+
+/**
+ * Convert Base64 string to ArrayBuffer
+ * @param {string} base64 - Base64 string
+ * @returns {ArrayBuffer} ArrayBuffer
+ */
+function base64ToArrayBuffer(base64) {
+    const binary = atob(base64)
+    const bytes = new Uint8Array(binary.length)
+    for (let i = 0; i < binary.length; i++) {
+        bytes[i] = binary.charCodeAt(i)
+    }
+    return bytes.buffer
+}
+
+/**
  * Load all files from localStorage
  * @returns {Array} Array of file objects
  */
@@ -15,7 +43,19 @@ export function loadFiles() {
         if (!filesJson) return []
 
         const files = JSON.parse(filesJson)
-        return Array.isArray(files) ? files : []
+
+        // Convert base64 data back to ArrayBuffer for each file
+        const filesWithArrayBuffer = files.map(file => {
+            if (file.dataBase64) {
+                return {
+                    ...file,
+                    data: base64ToArrayBuffer(file.dataBase64)
+                }
+            }
+            return file
+        })
+
+        return Array.isArray(filesWithArrayBuffer) ? filesWithArrayBuffer : []
     } catch (error) {
         console.error('Error loading files from localStorage:', error)
         return []
@@ -31,24 +71,39 @@ export function saveFile(fileData) {
     try {
         const files = loadFiles()
 
+        // Convert ArrayBuffer to base64 for storage
+        const fileToSave = { ...fileData }
+        if (fileData.data instanceof ArrayBuffer) {
+            fileToSave.dataBase64 = arrayBufferToBase64(fileData.data)
+            delete fileToSave.data // Remove ArrayBuffer from object before saving
+        }
+
         // Check if file already exists (by ID)
         const existingIndex = files.findIndex(f => f.id === fileData.id)
 
         if (existingIndex >= 0) {
             // Update existing file
-            files[existingIndex] = fileData
+            const updatedFile = { ...files[existingIndex], ...fileToSave }
+            // Keep base64 data from fileToSave if present
+            files[existingIndex] = updatedFile
         } else {
             // Add new file
-            files.push(fileData)
+            files.push(fileToSave)
         }
 
-        localStorage.setItem(FILES_STORAGE_KEY, JSON.stringify(files))
+        // Create storage object without ArrayBuffer
+        const filesToStore = files.map(f => {
+            const { data, ...rest } = f
+            return rest
+        })
+
+        localStorage.setItem(FILES_STORAGE_KEY, JSON.stringify(filesToStore))
         console.log(`File saved: ${fileData.name} (${fileData.id})`)
         return true
     } catch (error) {
         if (error.name === 'QuotaExceededError') {
             console.error('localStorage quota exceeded! Consider clearing old files.')
-            alert('Storage limit reached. Please delete some files to upload new ones.')
+            alert('Depolama limiti doldu. Yeni dosya yüklemek için bazı dosyaları silin.')
         } else {
             console.error('Error saving file to localStorage:', error)
         }

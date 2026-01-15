@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { MessageSquare, Plus, Trash2 } from 'lucide-react'
+import { MessageSquare, Plus, Trash2, Edit2, Check, X } from 'lucide-react'
 import ConfirmDialog from './ConfirmDialog'
 
 export default function ConversationList({
@@ -7,10 +7,13 @@ export default function ConversationList({
     activeId,
     onSelect,
     onDelete,
-    onNew
+    onNew,
+    onRename
 }) {
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
     const [conversationToDelete, setConversationToDelete] = useState(null)
+    const [editingId, setEditingId] = useState(null)
+    const [editingTitle, setEditingTitle] = useState('')
 
     const formatDate = (timestamp) => {
         const date = new Date(timestamp)
@@ -53,21 +56,65 @@ export default function ConversationList({
                         {conversations.map((conv) => (
                             <div
                                 key={conv.id}
-                                className={`group relative rounded-lg p-3 cursor-pointer transition-all ${activeId === conv.id
+                                className={`group relative rounded-lg p-3 ${editingId === conv.id ? '' : 'cursor-pointer'} transition-all ${activeId === conv.id
                                     ? 'bg-primary-600/20 border border-primary-500/50'
                                     : 'hover:bg-slate-700/50 border border-transparent'
                                     }`}
-                                onClick={() => onSelect(conv.id)}
+                                onClick={() => editingId !== conv.id && onSelect(conv.id)}
                             >
                                 <div className="flex items-start gap-2">
                                     <MessageSquare className={`w-4 h-4 mt-0.5 flex-shrink-0 ${activeId === conv.id ? 'text-primary-400' : 'text-gray-500'
                                         }`} />
 
                                     <div className="flex-1 min-w-0">
-                                        <p className={`text-sm font-medium truncate ${activeId === conv.id ? 'text-gray-200' : 'text-gray-300'
-                                            }`}>
-                                            {conv.title}
-                                        </p>
+                                        {editingId === conv.id ? (
+                                            <div className="flex items-center gap-1 mb-1">
+                                                <input
+                                                    type="text"
+                                                    value={editingTitle}
+                                                    onChange={(e) => setEditingTitle(e.target.value)}
+                                                    onClick={(e) => e.stopPropagation()}
+                                                    className="flex-1 text-sm font-medium bg-slate-700 text-gray-200 
+                                                               px-2 py-1 rounded border border-primary-500/50 focus:outline-none 
+                                                               focus:border-primary-500"
+                                                    autoFocus
+                                                    onKeyDown={(e) => {
+                                                        if (e.key === 'Enter') {
+                                                            onRename(conv.id, editingTitle)
+                                                            setEditingId(null)
+                                                        } else if (e.key === 'Escape') {
+                                                            setEditingId(null)
+                                                        }
+                                                    }}
+                                                />
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation()
+                                                        onRename(conv.id, editingTitle)
+                                                        setEditingId(null)
+                                                    }}
+                                                    className="p-1 hover:bg-green-500/20 rounded"
+                                                    title="Kaydet"
+                                                >
+                                                    <Check className="w-3.5 h-3.5 text-green-400" />
+                                                </button>
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation()
+                                                        setEditingId(null)
+                                                    }}
+                                                    className="p-1 hover:bg-red-500/20 rounded"
+                                                    title="İptal"
+                                                >
+                                                    <X className="w-3.5 h-3.5 text-red-400" />
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <p className={`text-sm font-medium truncate ${activeId === conv.id ? 'text-gray-200' : 'text-gray-300'
+                                                }`}>
+                                                {conv.title}
+                                            </p>
+                                        )}
                                         <div className="flex items-center gap-2 mt-1">
                                             <p className="text-xs text-gray-500">
                                                 {formatDate(conv.updatedAt)}
@@ -79,17 +126,32 @@ export default function ConversationList({
                                         </div>
                                     </div>
 
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation()
-                                            setConversationToDelete(conv.id)
-                                            setDeleteDialogOpen(true)
-                                        }}
-                                        className="opacity-0 group-hover:opacity-100 p-1 hover:bg-red-500/20 rounded transition-opacity"
-                                        title="Sohbeti sil"
-                                    >
-                                        <Trash2 className="w-4 h-4 text-gray-400 hover:text-red-400" />
-                                    </button>
+                                    {editingId !== conv.id && (
+                                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation()
+                                                    setEditingId(conv.id)
+                                                    setEditingTitle(conv.title)
+                                                }}
+                                                className="p-1 hover:bg-primary-500/20 rounded"
+                                                title="Başlığı düzenle"
+                                            >
+                                                <Edit2 className="w-4 h-4 text-gray-400 hover:text-primary-400" />
+                                            </button>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation()
+                                                    setConversationToDelete(conv.id)
+                                                    setDeleteDialogOpen(true)
+                                                }}
+                                                className="p-1 hover:bg-red-500/20 rounded"
+                                                title="Sohbeti sil"
+                                            >
+                                                <Trash2 className="w-4 h-4 text-gray-400 hover:text-red-400" />
+                                            </button>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         ))}

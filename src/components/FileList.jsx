@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import { FileText, Trash2, Eye, EyeOff } from 'lucide-react'
+import { FileText, Trash2, Eye, EyeOff, ExternalLink } from 'lucide-react'
 import ConfirmDialog from './ConfirmDialog'
 
-export default function FileList({ files, onDelete, onToggle }) {
+export default function FileList({ files, onDelete, onToggle, onPreview }) {
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
     const [fileToDelete, setFileToDelete] = useState(null)
 
@@ -52,6 +52,15 @@ export default function FileList({ files, onDelete, onToggle }) {
                                 </p>
                             </div>
                             <div className="flex items-center gap-1">
+                                {onPreview && (
+                                    <button
+                                        onClick={() => onPreview(file.id)}
+                                        className="p-1 hover:bg-primary-500/20 rounded transition-colors"
+                                        title="Belgeyi önizle"
+                                    >
+                                        <ExternalLink className="w-4 h-4 text-primary-400" />
+                                    </button>
+                                )}
                                 <button
                                     onClick={() => onToggle(file.id)}
                                     className="p-1 hover:bg-slate-600 rounded transition-colors"
