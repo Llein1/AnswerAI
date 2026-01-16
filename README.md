@@ -12,9 +12,9 @@ React, Gemini AI ve modern web teknolojileri ile geliştirilmiş; konuşma hafı
 
 ## 🎥 Uygulama Tanıtımı
 
-Uygulamanın tüm özelliklerini gösteren interaktif demo:
+Uygulamanın özelliklerini gösteren arayüz görünümü:
 
-![AnswerAI Demo](assets/demo.webp)
+![AnswerAI Demo](assets/demo.png)
 
 *Demo videoda: PDF yükleme, RAG chatbot ile soru-cevap, kaynak gösterimi ve arama özellikleri*
 
