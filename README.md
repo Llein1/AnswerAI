@@ -2,7 +2,13 @@
 
 React, Gemini AI ve modern web teknolojileri ile geliştirilmiş; konuşma hafızası, dosya kalıcılığı ve çoklu belge karşılaştırma yeteneklerine sahip modern bir RAG (Retrieval-Augmented Generation) chatbot.
 
-![AnswerAI Demo](assets/demo.png)
+## 🎥 Demo
+
+Uygulamanın tüm özelliklerini gösteren interaktif demo:
+
+![AnswerAI Demo](assets/demo.webp)
+
+*Demo videoda: PDF yükleme, RAG chatbot ile soru-cevap, kaynak gösterimi ve arama özellikleri*
 
 ![Durum](https://img.shields.io/badge/durum-production%20ready-brightgreen)
 ![React](https://img.shields.io/badge/React-18-blue)
@@ -78,26 +84,101 @@ React, Gemini AI ve modern web teknolojileri ile geliştirilmiş; konuşma hafı
 5. **Tarayıcınızı açın**
    - `http://localhost:5173` adresine gidin
 
-## 📖 Kullanım
+## 📖 Kullanım Rehberi
 
-### Temel Sohbet
-1. **PDF Yükleyin**: Yükleme alanına tıklayın veya PDF dosyalarını sürükleyin
-2. **Dosyaları Aktifleştirin**: Göz ikonunun açık olduğundan emin olun
-3. **Soru Sorun**: Sorunuzu yazın ve Enter'a basın
-4. **Kaynakları İnceleyin**: Cevabın altındaki kaynaklara tıklayarak detayları görün
+### 🎯 Adım 1: Belge Yükleme
 
-### Çoklu Belge Karşılaştırma
-1. **2 veya daha fazla PDF yükleyin** ve aktifleştirin
-2. **Karşılaştırma soruları sorun**:
-   - "Bu belgeleri karşılaştır"
-   - "Temel farklar neler?"
-   - "X hakkında hangi belgede daha fazla bilgi var?"
-3. **Karşılaştırmalı analizi** ve belge referanslarını inceleyin
+**PDF Dosyası Ekleme:**
+1. Sol yan panelde bulunan **"Dosya seçin veya sürükleyip bırakın"** alanını bulun
+2. İki yöntem ile dosya ekleyebilirsiniz:
+   - **Tıklama**: Alana tıklayarak bilgisayarınızdan PDF seçin
+   - **Sürükle-Bırak**: PDF dosyasını doğrudan bu alana sürükleyin
+3. Desteklenen formatlar: **PDF** ve **DOCX** (maks 10MB)
+4. Yükleme tamamlandığında dosya sol paneldeki listede görünecektir
 
-### Konuşma Yönetimi
-- **Yeni Sohbet**: Temiz bir sayfa açmak için "New Chat" butonuna tıklayın
-- **Sohbet Değiştir**: Yan menüden eski konuşmalarınıza tıklayın
-- **Sohbet Sil**: Çöp kutusu ikonuna tıklayın ve onaylayın
+> 💡 **İpucu**: Aynı anda birden fazla belge yükleyebilir ve aralarında geçiş yapabilirsiniz.
+
+---
+
+### 💬 Adım 2: Soru Sorma
+
+**RAG Chatbot ile Konuşma:**
+1. Yüklenen belgenin yanındaki **göz ikonu** açık olduğundan emin olun (aktif dosya)
+2. Sayfanın alt kısmındaki **sohbet kutusuna** sorunuzu yazın
+3. **Enter** tuşuna basın veya **gönder** butonuna tıklayın
+4. AI, yüklediğiniz belgelerden ilgili bilgileri çekerek cevap verecektir
+
+**Örnek Sorular:**
+```
+- "Bu belge ne hakkında?"
+- "X konusunda neler söyleniyor?"
+- "Y ve Z arasındaki ilişki nedir?"
+```
+
+---
+
+### 📚 Adım 3: Kaynak Referanslarını İnceleme
+
+**Cevabın Kaynağını Görme:**
+1. AI cevabının altında **"X kaynak kullanıldı"** yazısını göreceksiniz
+2. Bu yazıya **tıklayarak** kaynakları genişletin
+3. Her kaynak için şunlar gösterilir:
+   - 📄 Dosya adı
+   - 📃 Sayfa numarası
+   - 📊 Benzerlik skoru
+   - 📝 İlgili metin pasajı
+
+> 🎯 **Önemli**: Bu özellik sayesinde AI'nın hangi belgeden bilgi aldığını tam olarak görebilirsiniz.
+
+---
+
+### 🔍 Adım 4: Konuşma Arama
+
+**Geçmiş Sohbetlerde Arama:**
+1. Üst kısımdaki **arama kutusunu** kullanın
+2. Aramak istediğiniz kelimeyi yazın
+3. İlgili konuşmalar otomatik filtrelenecektir
+4. Sonuçlara tıklayarak doğrudan o sohbete gidebilirsiniz
+
+---
+
+### 🔄 Adım 5: Çoklu Belge Karşılaştırma
+
+**Birden Fazla Belge ile Çalışma:**
+1. **2 veya daha fazla PDF** yükleyin
+2. Her belgede **göz ikonunu** aktif edin
+3. Karşılaştırma soruları sorun:
+   ```
+   - "Bu iki belge arasındaki farklar neler?"
+   - "Hangi belgede X konusu daha detaylı?"
+   - "Her iki belgede de Y'den bahsediliyor mu?"
+   ```
+4. AI, tüm aktif belgelerden bilgi toplayarak karşılaştırmalı analiz yapacaktır
+
+---
+
+### 🗂️ Adım 6: Konuşma Yönetimi
+
+**Sohbetler Arasında Gezinme:**
+- **Yeni Sohbet**: Header'daki **"+ New Chat"** butonuna tıklayın
+- **Sohbet Geçmişi**: Sol paneldeki konuşma listesinden istediğinize tıklayın
+- **Sohbet Silme**: Konuşmanın yanındaki **çöp kutusu** ikonuna tıklayın
+- **Sohbet Yeniden Adlandırma**: Konuşma başlığına çift tıklayarak düzenleyin
+
+> 📌 **Not**: Tüm konuşmalar browser'ınızda (localStorage) saklanır ve sayfa yenilense bile kaybolmaz.
+
+---
+
+### ⚙️ Ek Özellikler
+
+**Dosya Yönetimi:**
+- 👁️ **Göz İkonu**: Belgeyi sohbete dahil et/çıkar
+- 🗑️ **Çöp İkonu**: Belgeyi sil
+- 📄 **Dosya Adı**: Tıklayarak önizleme açın (varsa)
+
+**Mesaj İşlemleri:**
+- 📋 **Kopyala**: AI cevaplarını panoya kopyalayın
+- 🔽 **Scroll**: Uzun sohbetlerde aşağı kaydırın (otomatik scroll)
 
 ## 🛠️ Teknoloji Yığını
 
