@@ -104,7 +104,21 @@ Deploy sonrası kontrol listesi:
 - [ ] Mobil cihazda test edildi mi?
 - [ ] Console'da hata var mı?
 
-### Deploy sonrası API hatası
+### LangChain Dependency Hatası (Vercel/Netlify)
+
+**Sorun**: `npm install` sırasında `@langchain/core` peer dependency conflict
+
+```
+ERESOLVE could not resolve
+peer @langchain/core@">=0.3.17 <0.4.0" from @langchain/google-genai
+```
+
+**Çözüm**: 
+- ✅ `vercel.json` zaten `--legacy-peer-deps` flag'i içeriyor
+- Vercel otomatik olarak bu sorunu çözecek
+- Eğer sorun devam ederse, Vercel dashboard'dan "Redeploy" yapın
+
+
 - Environment variable'ların hosting platformunda ayarlandığından emin olun
 - `VITE_` prefix'inin kullanıldığını kontrol edin
 - Browser console'da hata mesajlarını inceleyin
