@@ -165,7 +165,12 @@ retrieveContext(query, activeFileIds, minSimilarity = 0.4)
 const maxSize = 10 * 1024 * 1024
 ```
 
-## 🐛 Sorun Giderme
+## 🚀 Production Deployment
+
+Canlı ortam kurulumu, build işlemleri ve Vercel/Netlify deployment talimatları için [Deployment Rehberi](DEPLOYMENT.md)'ne göz atın.
+
+## 🆘 Sorun Giderme
+
 
 ### "API key not configured" hatası
 - `.env` dosyasının oluşturulduğundan emin olun
@@ -180,6 +185,12 @@ const maxSize = 10 * 1024 * 1024
 - İnternet bağlantınızı kontrol edin
 - Aktif dosya sayısını azaltmayı deneyin
 
----
+### Build hatası alıyorum
+- `node_modules` klasörünü silin ve `npm install` yapın
+- Node.js versiyonunun 18+ olduğunu kontrol edin
+- `.env` dosyasının doğru formatta olduğunu kontrol edin
 
-<sub>*Antigravity ile geliştirilmiştir.*</sub>
+
+## 🌐 Live Demo
+
+> Yakında eklenecek...
