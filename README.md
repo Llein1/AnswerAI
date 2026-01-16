@@ -2,7 +2,15 @@
 
 React, Gemini AI ve modern web teknolojileri ile geliştirilmiş; konuşma hafızası, dosya kalıcılığı ve çoklu belge karşılaştırma yeteneklerine sahip modern bir RAG (Retrieval-Augmented Generation) chatbot.
 
-## 🎥 Demo
+## � Live Demo
+
+**🚀 [AnswerAI - Canlı Demo](https://answer-ai-eta.vercel.app/)**
+
+> Uygulamayı hemen deneyin! Kendi PDF dosyalarınızı yükleyip yapay zeka ile konuşabilirsiniz.
+
+---
+
+## 🎥 Uygulama Tanıtımı
 
 Uygulamanın tüm özelliklerini gösteren interaktif demo:
 
@@ -270,8 +278,7 @@ Canlı ortam kurulumu, build işlemleri ve Vercel/Netlify deployment talimatlar�
 - `node_modules` klasörünü silin ve `npm install` yapın
 - Node.js versiyonunun 18+ olduğunu kontrol edin
 - `.env` dosyasının doğru formatta olduğunu kontrol edin
+- Browser console'da hata mesajlarını inceleyin
 
+---
 
-## 🌐 Live Demo
-
-> Yakında eklenecek...
