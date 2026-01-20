@@ -47,7 +47,7 @@ export async function createEmbedding(text) {
         return embedding
     } catch (error) {
         console.error('Embedding error:', error)
-        throw new Error(`Failed to create embedding: ${error.message}`)
+        throw new Error(`Embedding oluşturulurken hata: ${error.message}`)
     }
 }
 

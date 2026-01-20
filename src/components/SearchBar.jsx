@@ -72,6 +72,14 @@ export default function SearchBar({ onSearch, onClear, resultCount, filters, con
                     value={query}
                     onChange={handleChange}
                     onFocus={handleFocus}
+                    onBlur={(e) => {
+                        // Don't collapse if clicking on filter button or if there's a query
+                        setTimeout(() => {
+                            if (!query.trim() && !filterRef.current?.contains(document.activeElement)) {
+                                setIsExpanded(false)
+                            }
+                        }, 150)
+                    }}
                     placeholder="Ara..."
                     className="w-full pl-10 pr-20 py-2 bg-slate-800/50 border border-slate-700 
                                rounded-lg text-sm text-gray-200 placeholder-gray-500

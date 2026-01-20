@@ -7,7 +7,7 @@ import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism'
 import CopyButton from './CopyButton'
 import SourceReferences from './SourceReferences'
 
-export default function ChatInterface({ messages, isLoading, error, onPageClick }) {
+export default function ChatInterface({ messages, isLoading, onPageClick }) {
     const messagesEndRef = useRef(null)
 
     const scrollToBottom = () => {
@@ -18,7 +18,7 @@ export default function ChatInterface({ messages, isLoading, error, onPageClick 
         scrollToBottom()
     }, [messages, isLoading])
 
-    if (messages.length === 0 && !error) {
+    if (messages.length === 0) {
         return (
             <div className="flex-1 flex items-center justify-center p-8">
                 <div className="text-center max-w-md">
@@ -44,16 +44,6 @@ export default function ChatInterface({ messages, isLoading, error, onPageClick 
 
     return (
         <div className="flex-1 overflow-y-auto p-6 space-y-4">
-            {error && (
-                <div className="bg-red-500/10 border border-red-500/50 rounded-lg p-4 flex items-start gap-3 animate-fadeIn">
-                    <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
-                    <div>
-                        <p className="text-red-400 font-medium">Hata</p>
-                        <p className="text-red-300 text-sm mt-1">{error}</p>
-                    </div>
-                </div>
-            )}
-
             {messages.map((message, index) => (
                 <div
                     key={message.id}

@@ -143,7 +143,7 @@ export async function processDocument(text, fileId, fileName, pages = []) {
         return processedChunks.length
     } catch (error) {
         console.error('Document processing error:', error)
-        throw new Error(`Failed to process document: ${error.message}`)
+        throw new Error(`Belge işlenirken hata oluştu: ${error.message}`)
     }
 }
 
@@ -162,7 +162,7 @@ export async function retrieveContext(query, activeFileIds, minSimilarity = 0.4)
         )
 
         if (activeChunks.length === 0) {
-            throw new Error('No processed chunks available from active files')
+            throw new Error('Aktif dosyalardan işlenmiş içerik bulunamadı')
         }
 
         console.log(`🔍 Searching ${activeChunks.length} chunks for: "${query}"`)
@@ -210,7 +210,7 @@ export async function retrieveContext(query, activeFileIds, minSimilarity = 0.4)
                 const pages = chunk.pageNumbers && chunk.pageNumbers.length > 0
                     ? ` (Pages: ${chunk.pageNumbers.join(', ')})`
                     : ''
-                contextParts.push(`[Excerpt ${i + 1}${pages}]`)
+                contextParts.push(`[Alıntı ${i + 1}${pages}]`)
                 contextParts.push(chunk.text)
                 contextParts.push('') // blank line between excerpts
             })
@@ -229,7 +229,7 @@ export async function retrieveContext(query, activeFileIds, minSimilarity = 0.4)
         }
     } catch (error) {
         console.error('Context retrieval error:', error)
-        throw new Error(`Failed to retrieve context: ${error.message}`)
+        throw new Error(`Bağlam alınırken hata oluştu: ${error.message}`)
     }
 }
 
@@ -291,7 +291,7 @@ export async function generateRAGResponse(question, activeFiles) {
         }
     } catch (error) {
         console.error('RAG pipeline error:', error)
-        throw new Error(`Failed to generate answer: ${error.message}`)
+        throw new Error(`Cevap oluşturulurken hata oluştu: ${error.message}`)
     }
 }
 

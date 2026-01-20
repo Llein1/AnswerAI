@@ -8,6 +8,7 @@ import ChatInterface from './components/ChatInterface'
 import ChatInput from './components/ChatInput'
 import ConversationList from './components/ConversationList'
 import ConfirmDialog from './components/ConfirmDialog'
+import ToastContainer from './components/ToastContainer'
 // Lazy load viewers to reduce initial bundle size
 const PDFViewer = lazy(() => import('./components/PDFViewer'))
 const DOCXViewer = lazy(() => import('./components/DOCXViewer'))
@@ -18,13 +19,14 @@ import { generateRAGResponse } from './services/ragService'
 import * as ConvStorage from './services/conversationStorage'
 import * as FileStorage from './services/fileStorage'
 import { searchConversations, debounce, invalidateSearchCache } from './services/searchService'
+import { ToastProvider, useToast } from './hooks/useToast.jsx'
 
-function App() {
+function AppContent() {
     const [files, setFiles] = useState([])
     const [messages, setMessages] = useState([])
     const [isLoading, setIsLoading] = useState(false)
-    const [error, setError] = useState(null)
     const [sidebarOpen, setSidebarOpen] = useState(false)
+    const { toasts, removeToast, showError } = useToast()
 
     // Conversation management
     const [conversations, setConversations] = useState([])
@@ -97,7 +99,7 @@ function App() {
 
     const handleFileUpload = async (file) => {
         try {
-            setError(null)
+            // Error handling via toast
 
             // Process file using unified service (supports PDF, TXT, MD, DOCX)
             const { text, metadata } = await processFile(file)
@@ -123,10 +125,10 @@ function App() {
             if (saved) {
                 setFiles(prev => [...prev, newFile])
             } else {
-                throw new Error('Failed to save file to storage')
+                throw new Error('Dosya depolama alanına kaydedilemedi')
             }
         } catch (err) {
-            setError(err.message)
+            showError(err.message)
             console.error('File upload error:', err)
         }
     }
@@ -155,7 +157,7 @@ function App() {
 
         const activeFiles = files.filter(f => f.active)
         if (activeFiles.length === 0) {
-            setError('Sohbete başlamak için lütfen en az bir dosya yükleyin ve aktifleştirin.')
+            showError('Sohbete başlamak için lütfen en az bir dosya yükleyin ve aktifleştirin.')
             return
         }
 
@@ -168,7 +170,7 @@ function App() {
         }
         setMessages(prev => [...prev, userMessage])
         setIsLoading(true)
-        setError(null)
+        // Error handling via toast
 
         try {
             // Generate AI response using RAG
@@ -183,7 +185,7 @@ function App() {
             }
             setMessages(prev => [...prev, aiMessage])
         } catch (err) {
-            setError(err.message)
+            showError(err.message)
             console.error('Chat error:', err)
         } finally {
             setIsLoading(false)
@@ -203,7 +205,7 @@ function App() {
             const newConv = ConvStorage.createNewConversation()
             setActiveConversationId(newConv.id)
             setMessages([])
-            setError(null)
+            // Cleared chat
             setConversations(ConvStorage.getConversationsInOrder())
         }
         setClearChatDialogOpen(false)
@@ -214,7 +216,7 @@ function App() {
         const newConv = ConvStorage.createNewConversation()
         setActiveConversationId(newConv.id)
         setMessages([])
-        setError(null)
+        // New conversation
         setConversations(ConvStorage.getConversationsInOrder())
         console.log('Created new conversation:', newConv.id)
     }
@@ -429,8 +431,8 @@ function App() {
 
     return (
         <Layout>
-            {/* Sticky Header */}
-            <div className="sticky top-0 z-20 bg-slate-900/95 backdrop-blur-sm border-b border-slate-700">
+            {/* Fixed Header */}
+            <div className="flex-shrink-0 z-20 bg-slate-900/95 backdrop-blur-sm border-b border-slate-700">
                 <div className="relative" ref={searchContainerRef}>
                     <Header
                         onClearChat={handleClearChat}
@@ -474,10 +476,10 @@ function App() {
                 </button>
 
                 {/* Sidebar - Conversations & Files */}
-                <div className={`w-80 bg-slate-800/50 border-r border-slate-700 flex flex-col transition-transform duration-300 md:relative md:translate-x-0 ${sidebarOpen ? 'translate-x-0 fixed inset-y-0 left-0 z-40' : '-translate-x-full fixed'
+                <div className={`w-80 bg-slate-800/50 border-r border-slate-700 flex flex-col overflow-hidden transition-transform duration-300 md:relative md:translate-x-0 ${sidebarOpen ? 'translate-x-0 fixed inset-y-0 left-0 z-40' : '-translate-x-full fixed'
                     }`}>
                     {/* Conversation List - Top Half */}
-                    <div className="h-1/2 border-b border-slate-700 flex flex-col">
+                    <div className="min-h-0 border-b border-slate-700 flex flex-col max-h-[50vh]">
                         <ConversationList
                             conversations={conversations}
                             activeId={activeConversationId}
@@ -489,7 +491,7 @@ function App() {
                     </div>
 
                     {/* File Management - Bottom Half */}
-                    <div className="h-1/2 flex flex-col">
+                    <div className="min-h-0 flex flex-col flex-1">
                         <FileUpload onFileUpload={handleFileUpload} />
                         <FileList
                             files={files}
@@ -509,7 +511,7 @@ function App() {
                 )}
 
                 {/* Main Chat Area */}
-                <div className={`flex-1 flex flex-col relative ${previewFile ? 'lg:pr-96' : ''}`}>
+                <div className={`flex-1 flex flex-col overflow-hidden relative ${previewFile ? 'lg:pr-96' : ''}`}>
                     {/* Scrollable Chat Interface */}
                     <div
                         ref={chatScrollRef}
@@ -519,7 +521,6 @@ function App() {
                         <ChatInterface
                             messages={messages}
                             isLoading={isLoading}
-                            error={error}
                             onPageClick={handlePageClick}
                         />
                     </div>
@@ -616,6 +617,9 @@ function App() {
                 />
             </div>
 
+            {/* Toast Container */}
+            <ToastContainer toasts={toasts} onClose={removeToast} />
+
             {/* Clear Chat Confirmation Dialog */}
             <ConfirmDialog
                 isOpen={clearChatDialogOpen}
@@ -628,4 +632,12 @@ function App() {
     )
 }
 
-export default App
+// Wrap the app with ToastProvider
+export default function App() {
+    return (
+        <ToastProvider>
+            <AppContent />
+        </ToastProvider>
+    )
+}
+

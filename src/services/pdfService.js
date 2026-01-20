@@ -45,7 +45,7 @@ export async function extractTextFromPDF(file) {
         }
 
         if (!fullText || fullText.trim().length < 10) {
-            throw new Error('PDF appears to be empty or unreadable')
+            throw new Error('PDF boş veya okunamıyor görünüyor')
         }
 
         return {
@@ -55,7 +55,7 @@ export async function extractTextFromPDF(file) {
         }
     } catch (error) {
         console.error('PDF extraction error:', error)
-        throw new Error(`Failed to extract PDF: ${error.message}`)
+        throw new Error(`PDF çıkarılırken hata oluştu: ${error.message}`)
     }
 }
 
@@ -68,19 +68,19 @@ export function validatePDFFile(file) {
     const maxSize = 10 * 1024 * 1024 // 10MB
 
     if (!file) {
-        throw new Error('No file provided')
+        throw new Error('Dosya bulunamadı')
     }
 
     if (file.type !== 'application/pdf') {
-        throw new Error('Only PDF files are supported')
+        throw new Error('Yalnızca PDF dosyaları desteklenmektedir')
     }
 
     if (file.size > maxSize) {
-        throw new Error('File size must be less than 10MB')
+        throw new Error('Dosya boyutu 10MB\'den küçük olmalıdır')
     }
 
     if (file.size === 0) {
-        throw new Error('File is empty')
+        throw new Error('Dosya boş')
     }
 
     return true

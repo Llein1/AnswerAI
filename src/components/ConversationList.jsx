@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { MessageSquare, Plus, Trash2, Edit2, Check, X } from 'lucide-react'
+import { MessageSquare, Plus, Trash2, Edit2, Check, X, Search } from 'lucide-react'
 import ConfirmDialog from './ConfirmDialog'
 
 export default function ConversationList({
@@ -14,6 +14,7 @@ export default function ConversationList({
     const [conversationToDelete, setConversationToDelete] = useState(null)
     const [editingId, setEditingId] = useState(null)
     const [editingTitle, setEditingTitle] = useState('')
+    const [searchQuery, setSearchQuery] = useState('')
 
     const formatDate = (timestamp) => {
         const date = new Date(timestamp)
@@ -30,6 +31,11 @@ export default function ConversationList({
         return date.toLocaleDateString('tr-TR')
     }
 
+    // Filter conversations based on search query
+    const filteredConversations = conversations.filter(conv =>
+        conv.title.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+
     return (
         <div className="flex flex-col h-full">
             {/* Header with New Chat button */}
@@ -43,17 +49,40 @@ export default function ConversationList({
                 </button>
             </div>
 
+            {/* Conversations Header with Search */}
+            <div className="px-3 py-2 border-b border-slate-600">
+                <div className="flex items-center gap-2">
+                    <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide whitespace-nowrap">
+                        Sohbetler ({conversations.length})
+                    </h3>
+                    <div className="relative flex-1">
+                        <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-500" />
+                        <input
+                            type="text"
+                            placeholder="Ara..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="w-full bg-slate-700/50 border border-slate-600 rounded-md pl-8 pr-2 py-1 text-xs text-gray-300 placeholder-gray-500 focus:outline-none focus:border-primary-500 transition-colors"
+                        />
+                    </div>
+                </div>
+            </div>
+
             {/* Conversation List */}
             <div className="flex-1 overflow-y-auto">
-                {conversations.length === 0 ? (
+                {filteredConversations.length === 0 ? (
                     <div className="p-4 text-center text-gray-500">
                         <MessageSquare className="w-12 h-12 mx-auto mb-2 opacity-30" />
-                        <p className="text-sm">Henüz sohbet yok</p>
-                        <p className="text-xs mt-1">Başlamak için yeni sohbet oluşturun</p>
+                        <p className="text-sm">
+                            {searchQuery ? 'Sohbet bulunamadı' : 'Henüz sohbet yok'}
+                        </p>
+                        <p className="text-xs mt-1">
+                            {searchQuery ? 'Farklı bir arama deneyin' : 'Başlamak için yeni sohbet oluşturun'}
+                        </p>
                     </div>
                 ) : (
                     <div className="p-2 space-y-1">
-                        {conversations.map((conv) => (
+                        {filteredConversations.map((conv) => (
                             <div
                                 key={conv.id}
                                 className={`group relative rounded-lg p-3 ${editingId === conv.id ? '' : 'cursor-pointer'} transition-all ${activeId === conv.id
@@ -157,13 +186,6 @@ export default function ConversationList({
                         ))}
                     </div>
                 )}
-            </div>
-
-            {/* Footer info */}
-            <div className="p-3 border-t border-slate-700">
-                <p className="text-xs text-gray-500 text-center">
-                    {conversations.length} sohbet
-                </p>
             </div>
 
             {/* Confirmation Dialog */}
