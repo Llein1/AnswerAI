@@ -39,9 +39,9 @@ export default function FilterPanel({ filters, conversations, onFilterChange, on
         (filters.messageType !== 'all' ? 1 : 0)
 
     return (
-        <div className="absolute left-0 top-full mt-2 w-80 bg-slate-800 border border-slate-700 rounded-lg shadow-xl z-60 overflow-hidden">
+        <div className="absolute right-0 top-full mt-2 w-80 bg-slate-800 border border-slate-700 rounded-lg shadow-xl z-[100] overflow-hidden max-h-[calc(100vh-120px)]">
             {/* Date Range Section */}
-            <div className="p-4 border-b border-slate-700 max-h-64 overflow-y-auto">
+            <div className="p-4 border-b border-slate-700 max-h-[30vh] overflow-y-auto">
                 <div className="flex items-center gap-2 mb-3">
                     <Calendar className="w-4 h-4 text-gray-400" />
                     <span className="text-sm font-medium text-gray-200">Tarih Aralığı</span>
@@ -105,7 +105,7 @@ export default function FilterPanel({ filters, conversations, onFilterChange, on
             </div>
 
             {/* Conversations Section */}
-            <div className="p-4 border-b border-slate-700 max-h-48 overflow-y-auto">
+            <div className="p-4 border-b border-slate-700 max-h-[25vh] overflow-y-auto">
                 <div className="flex items-center gap-2 mb-3">
                     <MessageSquare className="w-4 h-4 text-gray-400" />
                     <span className="text-sm font-medium text-gray-200">Konuşmalar</span>

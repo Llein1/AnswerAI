@@ -2,7 +2,7 @@
 
 React, Gemini AI ve modern web teknolojileri ile geliştirilmiş; konuşma hafızası, dosya kalıcılığı ve çoklu belge karşılaştırma yeteneklerine sahip modern bir RAG (Retrieval-Augmented Generation) chatbot.
 
-## � Live Demo
+## 📺 Live Demo
 
 **🚀 [AnswerAI - Canlı Demo](https://answer-ai-eta.vercel.app/)**
 
@@ -16,7 +16,7 @@ Uygulamanın özelliklerini gösteren arayüz görünümü:
 
 ![AnswerAI Demo](assets/demo.png)
 
-*Demo videoda: PDF yükleme, RAG chatbot ile soru-cevap, kaynak gösterimi ve arama özellikleri*
+*Modern arayüz: PDF yükleme, RAG chatbot ile soru-cevap, kaynak gösterimi ve gelişmiş arama özellikleri*
 
 ![Durum](https://img.shields.io/badge/durum-production%20ready-brightgreen)
 ![React](https://img.shields.io/badge/React-18-blue)
@@ -25,37 +25,47 @@ Uygulamanın özelliklerini gösteren arayüz görünümü:
 ## ✨ Özellikler
 
 ### 📄 Belge Yönetimi
-- **PDF Yükleme**: Sürükle-bırak veya tıklayarak PDF yükleme (maks 10MB)
-- **Çoklu Dosya Desteği**: Aynı anda birden fazla PDF yükleyin ve yönetin
-- **Dosya Kalıcılığı**: Yüklenen dosyalar sayfa yenilense bile kaybolmaz (localStorage)
+- **PDF ve DOCX Desteği**: Birden fazla format desteği (maks 10MB)
+- **IndexedDB Kalıcılığı**: Dosyalar tarayıcı veritabanında saklanır, sayfa kapansa bile kalır
+- **Chunk Önbellekleme**: İşlenmiş metinler kaydedilir, yeniden işleme gerekmez
+- **Çoklu Dosya**: Aynı anda birden fazla belge yükleyin ve yönetin
 - **Aktif/Pasif Kontrolü**: Hangi belgelerin sohbete dahil edileceğini seçin
-- **Dosya Detayları**: Sayfa sayısı, dosya boyutu ve yükleme tarihi bilgileri
+- **Dosya Detayları**: Sayfa sayısı, boyut, yükleme tarihi
 
 ### 💬 Konuşma Özellikleri
-- **Konuşma Hafızası**: Tüm sohbetler otomatik olarak localStorage'a kaydedilir
-- **Kalıcı Geçmiş**: Sayfa yenilendiğinde sohbetleriniz silinmez
-- **Otomatik Başlıklandırma**: İlk mesaja göre konuşma başlığı otomatik oluşturulur
-- **Hızlı Geçiş**: Kayıtlı konuşmalar arasında anında geçiş yapın
-- **Silme Koruması**: Yanlışlıkla silmeyi önlemek için özel onay kutuları
+- **IndexedDB Depolama**: Tüm sohbetler güvenli ve hızlı depolanır
+- **Kalıcı Geçmiş**: Tarayıcı kapansa bile konuşmalar kaybolmaz
+- **Otomatik Başlıklandırma**: İlk mesaja göre akıllı başlık oluşturma
+- **Sohbet Yönetimi**: Yeniden adlandırma, silme, geçiş yapma
+- **Hızlı Geçiş**: Kayıtlı konuşmalar arasında anında geçiş
 
 ### 🔍 Gelişmiş RAG Yetenekleri
 - **Semantik Arama**: Gemini embedding'leri ile vektör benzerlik araması
 - **Çoklu Belge Soru-Cevap**: Birden fazla PDF üzerinden soru sorun
-- **Belge Karşılaştırma**: Karşılaştırma sorularını akıllıca tespit eder
-  - "Bu iki belge arasındaki farklar neler?"
-  - "Hangi belgede X konusu daha detaylı anlatılıyor?"
-  - "Her iki belgede de Y'den bahsediliyor mu?"
-- **Kaynak Gösterimi**: Cevabın hangi belgenin kaçıncı sayfasından geldiğini görün
-- **Alaka Puanlaması**: Benzerlik eşiğine göre dinamik kaynak seçimi
+- **Belge Karşılaştırma**: Akıllı karşılaştırma yetenekleri
+- **Kaynak Gösterimi**: Cevabın hangi belgeden ve sayfa numarasından geldiğini görün
+- **Chunk Caching**: İşlenmiş chunk'lar IndexedDB'de saklanır
+
+### 🔎 Gelişmiş Arama
+- **Konuşma Araması**: Tüm sohbet geçmişinde anahtar kelime arama
+- **Mesaj Vurgulama**: Bulunan sonuçlar vurgulanır ve otomatik scroll
+- **Filtreleme**: Tarih aralığı, konuşma, mesaj tipi filtreleri
+- **Önbellek Sistemi**: Hızlı arama sonuçları
+
+### ⚙️ Ayarlar Yönetimi
+- **UI Üzerinden API Key**: Ayarlar panelinden kolayca API anahtarı girilebilir
+- **Chunk Boyutu Ayarı**: RAG performansını optimize edebilirsiniz
+- **Örtüşme (Overlap) Kontrolü**: Chunk'lar arası örtüşme ayarlanabilir
+- **Benzerlik Eşiği**: Minimum benzerlik skoru ayarlanabilir
 
 ### 🎨 Modern Kullanıcı Deneyimi (UX)
-- **Sabit Başlık**: Navigasyon her zaman üstte erişilebilir
-- **Sabit Giriş**: Sohbet kutusu her zaman altta görünür
-- **Bağımsız Kaydırma**: Konuşmalar ve dosyalar için ayrı kaydırma alanları
+- **Glassmorphism**: Modern ve şık arayüz tasarımı
+- **Responsive**: Mobil, tablet ve masaüstü uyumlu
+- **Lazy Loading**: PDF ve DOCX görüntüleyiciler ihtiyaç anında yüklenir
+- **Error Boundaries**: Hata yönetimi ve kullanıcı dostu mesajlar
+- **Toast Bildirimleri**: Kullanıcı dostu bildirim sistemi
 - **Markdown Desteği**: AI cevaplarında zengin metin biçimlendirmesi
-- **Tek Tıkla Kopyalama**: AI cevaplarını kolayca panoya kopyalayın
-- **Karanlık Tema**: Glassmorphism efektleriyle modern ve şık arayüz
-- **Mobil Uyumlu**: Masaüstü ve mobil cihazlarda sorunsuz çalışır
+- **Syntax Highlighting**: Kod bloklarında renkli gösterim
 
 ## 🚀 Hızlı Başlangıç
 
@@ -77,44 +87,39 @@ Uygulamanın özelliklerini gösteren arayüz görünümü:
    npm install
    ```
 
-3. **Çevresel değişkenleri ayarlayın**
-   - `.env.example` dosyasını `.env` olarak kopyalayın
-   - Gemini API anahtarınızı ekleyin:
-   ```env
-   VITE_GEMINI_API_KEY=api_anahtariniz_buraya
-   ```
-
-4. **Geliştirme sunucusunu başlatın**
+3. **Geliştirme sunucusunu başlatın**
    ```bash
    npm run dev
    ```
 
-5. **Tarayıcınızı açın**
+4. **Tarayıcınızda ayarlara gidin**
    - `http://localhost:5173` adresine gidin
+   - Sağ üst köşedeki **⚙️ Ayarlar** butonuna tıklayın
+   - Gemini API anahtarınızı girin
+   - Kaydedin ve kullanmaya başlayın!
+
+> 💡 **Not**: API anahtarı artık UI üzerinden giriliyor, `.env` dosyası opsiyonel.
 
 ## 📖 Kullanım Rehberi
 
-### 🎯 Adım 1: Belge Yükleme
+### 🎯 Adım 1: API Anahtarı Ayarlama
 
-**PDF Dosyası Ekleme:**
-1. Sol yan panelde bulunan **"Dosya seçin veya sürükleyip bırakın"** alanını bulun
-2. İki yöntem ile dosya ekleyebilirsiniz:
-   - **Tıklama**: Alana tıklayarak bilgisayarınızdan PDF seçin
-   - **Sürükle-Bırak**: PDF dosyasını doğrudan bu alana sürükleyin
-3. Desteklenen formatlar: **PDF** ve **DOCX** (maks 10MB)
-4. Yükleme tamamlandığında dosya sol paneldeki listede görünecektir
+1. Sağ üstten **⚙️ Ayarlar** butonuna tıklayın
+2. **Gemini API Key** alanına anahtarınızı yapıştırın
+3. İsteğe bağlı: Chunk boyutu ve benzerlik eşiği ayarlayın
+4. **Kaydet** butonuna tıklayın
 
-> 💡 **İpucu**: Aynı anda birden fazla belge yükleyebilir ve aralarında geçiş yapabilirsiniz.
+### 📄 Adım 2: Belge Yükleme
 
----
+1. Sol paneldeki **"Dosya seçin veya sürükleyip bırakın"** alanını kullanın
+2. PDF veya DOCX dosyanızı seçin (maks 10MB)
+3. Dosya yüklendikten sonra otomatik işlenir ve IndexedDB'ye kaydedilir
 
-### 💬 Adım 2: Soru Sorma
+### 💬 Adım 3: Soru Sorma
 
-**RAG Chatbot ile Konuşma:**
-1. Yüklenen belgenin yanındaki **göz ikonu** açık olduğundan emin olun (aktif dosya)
-2. Sayfanın alt kısmındaki **sohbet kutusuna** sorunuzu yazın
-3. **Enter** tuşuna basın veya **gönder** butonuna tıklayın
-4. AI, yüklediğiniz belgelerden ilgili bilgileri çekerek cevap verecektir
+1. Yüklenen belgenin **göz ikonu** aktif olduğundan emin olun
+2. Alt kısımdaki sohbet kutusuna sorunuzu yazın
+3. Enter tuşuna basın veya gönder butonuna tıklayın
 
 **Örnek Sorular:**
 ```
@@ -123,70 +128,26 @@ Uygulamanın özelliklerini gösteren arayüz görünümü:
 - "Y ve Z arasındaki ilişki nedir?"
 ```
 
----
+### 📚 Adım 4: Kaynak Referanslarını İnceleme
 
-### 📚 Adım 3: Kaynak Referanslarını İnceleme
+1. AI cevabının altındaki **"X kaynak kullanıldı"** yazısına tıklayın
+2. Her kaynak için dosya adı, sayfa numarası ve benzerlik skoru görüntülenir
 
-**Cevabın Kaynağını Görme:**
-1. AI cevabının altında **"X kaynak kullanıldı"** yazısını göreceksiniz
-2. Bu yazıya **tıklayarak** kaynakları genişletin
-3. Her kaynak için şunlar gösterilir:
-   - 📄 Dosya adı
-   - 📃 Sayfa numarası
-   - 📊 Benzerlik skoru
-   - 📝 İlgili metin pasajı
+### 🔍 Adım 5: Konuşma Arama
 
-> 🎯 **Önemli**: Bu özellik sayesinde AI'nın hangi belgeden bilgi aldığını tam olarak görebilirsiniz.
-
----
-
-### 🔍 Adım 4: Konuşma Arama
-
-**Geçmiş Sohbetlerde Arama:**
 1. Üst kısımdaki **arama kutusunu** kullanın
 2. Aramak istediğiniz kelimeyi yazın
-3. İlgili konuşmalar otomatik filtrelenecektir
-4. Sonuçlara tıklayarak doğrudan o sohbete gidebilirsiniz
+3. Sonuçlara tıklayarak o mesaja gidin
 
----
+### 🔄 Adım 6: Çoklu Belge Karşılaştırma
 
-### 🔄 Adım 5: Çoklu Belge Karşılaştırma
-
-**Birden Fazla Belge ile Çalışma:**
-1. **2 veya daha fazla PDF** yükleyin
-2. Her belgede **göz ikonunu** aktif edin
+1. **2 veya daha fazla dosya** yükleyin
+2. Her belgenin **göz ikonunu** aktif edin
 3. Karşılaştırma soruları sorun:
    ```
    - "Bu iki belge arasındaki farklar neler?"
    - "Hangi belgede X konusu daha detaylı?"
-   - "Her iki belgede de Y'den bahsediliyor mu?"
    ```
-4. AI, tüm aktif belgelerden bilgi toplayarak karşılaştırmalı analiz yapacaktır
-
----
-
-### 🗂️ Adım 6: Konuşma Yönetimi
-
-**Sohbetler Arasında Gezinme:**
-- **Yeni Sohbet**: Header'daki **"+ New Chat"** butonuna tıklayın
-- **Sohbet Geçmişi**: Sol paneldeki konuşma listesinden istediğinize tıklayın
-- **Sohbet Silme**: Konuşmanın yanındaki **çöp kutusu** ikonuna tıklayın
-- **Sohbet Yeniden Adlandırma**: Konuşma başlığına çift tıklayarak düzenleyin
-
-> 📌 **Not**: Tüm konuşmalar browser'ınızda (localStorage) saklanır ve sayfa yenilense bile kaybolmaz.
-
----
-
-### ⚙️ Ek Özellikler
-
-**Dosya Yönetimi:**
-- 👁️ **Göz İkonu**: Belgeyi sohbete dahil et/çıkar
-- 🗑️ **Çöp İkonu**: Belgeyi sil
-- 📄 **Dosya Adı**: Tıklayarak önizleme açın (varsa)
-
-**Mesaj İşlemleri:**
-- 📋 **Kopyala**: AI cevaplarını panoya kopyalayın
-- 🔽 **Scroll**: Uzun sohbetlerde aşağı kaydırın (otomatik scroll)
 
 ## 🛠️ Teknoloji Yığını
 
@@ -194,13 +155,15 @@ Uygulamanın özelliklerini gösteren arayüz görünümü:
 |----------|-----------|
 | **Frontend** | React 18 + Vite |
 | **Stil** | Tailwind CSS |
+| **Veritabanı** | IndexedDB (Dexie.js) |
 | **PDF İşleme** | PDF.js (Mozilla) |
+| **DOCX İşleme** | Mammoth.js |
 | **AI/LLM** | Google Gemini 2.5 Flash |
 | **Embeddings** | Gemini text-embedding-004 |
-| **RAG Pipeline** | Özel vektör benzerlik araması |
-| **State Yönetimi** | React Hooks + localStorage |
+| **RAG Pipeline** | LangChain + Özel vektör arama |
+| **State Yönetimi** | React Hooks |
 | **İkonlar** | Lucide React |
-| **Markdown** | React Markdown + remark-gfm |
+| **Markdown** | React Markdown + Syntax Highlighter |
 
 ## 📁 Proje Yapısı
 
@@ -209,76 +172,123 @@ AnswerAI/
 ├── src/
 │   ├── components/
 │   │   ├── Layout.jsx              # Ana düzen
-│   │   ├── Header.jsx              # Sabit başlık
-│   │   ├── FileUpload.jsx          # PDF yükleme alanı
+│   │   ├── Header.jsx              # Sabit başlık + arama
+│   │   ├── FileUpload.jsx          # Dosya yükleme
 │   │   ├── FileList.jsx            # Dosya listesi
 │   │   ├── ChatInterface.jsx       # Mesaj alanı
-│   │   ├── ChatInput.jsx           # Mesaj giriş kutusu
-│   │   ├── ConversationList.jsx    # Sohbet geçmişi listesi
-│   │   ├── ConfirmDialog.jsx       # Onay modalı
-│   │   ├── CopyButton.jsx          # Kopyalama butonu
-│   │   └── SourceReferences.jsx    # Kaynak gösterimi
+│   │   ├── ChatInput.jsx           # Mesaj giriş
+│   │   ├── ConversationList.jsx    # Sohbet listesi
+│   │   ├── Settings.jsx            # Ayarlar modalı
+│   │   ├── SearchResults.jsx       # Arama sonuçları
+│   │   ├── PDFViewer.jsx           # PDF önizleme (lazy)
+│   │   ├── DOCXViewer.jsx          # DOCX önizleme (lazy)
+│   │   ├── ErrorBoundary.jsx       # Hata yönetimi
+│   │   └── ToastContainer.jsx      # Bildirimler
 │   ├── services/
-│   │   ├── pdfService.js           # PDF metin çıkarma
-│   │   ├── geminiService.js        # Gemini API entegrasyonu
-│   │   ├── ragService.js           # RAG ve vektör arama
-│   │   ├── conversationStorage.js  # Konuşma kaydetme
-│   │   └── fileStorage.js          # Dosya kaydetme
+│   │   ├── indexedDBService.js     # IndexedDB yönetimi
+│   │   ├── fileProcessingService.js # Dosya işleme
+│   │   ├── fileStorage.js          # Dosya depolama
+│   │   ├── conversationStorage.js  # Sohbet depolama
+│   │   ├── settingsStorage.js      # Ayarlar depolama
+│   │   ├── geminiService.js        # Gemini API
+│   │   ├── ragService.js           # RAG + vektör arama
+│   │   ├── searchService.js        # Arama servisi
+│   │   └── chunkCacheService.js    # Chunk önbellekleme
+│   ├── hooks/
+│   │   └── useToast.jsx            # Toast hook
 │   ├── App.jsx                     # Ana uygulama
 │   ├── main.jsx                    # Giriş noktası
 │   └── index.css                   # Global stiller
-├── .env.example                    # Örnek env dosyası
+├── vite.config.js                  # Vite yapılandırması
+├── netlify.toml                    # Netlify ayarları
 ├── package.json                    # Bağımlılıklar
 └── README.md                       # Bu dosya
 ```
 
 ## 🔧 Yapılandırma
 
-### RAG Parametreleri
+### Ayarlar Paneli
 
-**Chunk Boyutu** (varsayılan: 1000 karakter, 200 örtüşme)
-```javascript
-// src/services/ragService.js
-splitTextIntoChunks(text, chunkSize = 1000, overlap = 200)
-```
+Tüm ayarlar artık **UI üzerinden** yapılandırılıyor:
 
-**Benzerlik Eşiği** (varsayılan: 0.4)
-```javascript
-// src/services/ragService.js
-retrieveContext(query, activeFileIds, minSimilarity = 0.4)
-```
+- **API Anahtarı**: Gemini API anahtarınız
+- **Chunk Boyutu**: Varsayılan 1000 karakter
+- **Örtüşme (Overlap)**: Varsayılan 200 karakter
+- **Benzerlik Eşiği**: Varsayılan 0.4 (0-1 arası)
 
-**Dosya Boyut Limiti** (varsayılan: 10MB)
-```javascript
-// src/services/pdfService.js
-const maxSize = 10 * 1024 * 1024
-```
+Ayarlar `localStorage`'da saklanır ve tüm cihazlarınızda kalıcıdır.
 
 ## 🚀 Production Deployment
 
-Canlı ortam kurulumu, build işlemleri ve Vercel/Netlify deployment talimatları için [Deployment Rehberi](DEPLOYMENT.md)'ne göz atın.
+Canlı ortam kurulumu için detaylı talimatlar: **[DEPLOYMENT.md](DEPLOYMENT.md)**
+
+**Hızlı Deploy:**
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/Llein1/AnswerAI)
+[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/Llein1/AnswerAI)
+
+> 💡 **Not**: Environment variable'a gerek yok! Kullanıcılar kendi API anahtarlarını UI üzerinden girerler (BYOK modeli).
+
+## 🔒 Güvenlik ve Gizlilik
+
+**AnswerAI tamamen client-side çalışır:**
+
+- ✅ **API Anahtarları**: Sadece tarayıcınızın localStorage'ında saklanır
+- ✅ **Veri Gizliliği**: Tüm veriler (dosyalar, sohbetler) IndexedDB'de yerel olarak tutulur
+- ✅ **BYOK Modeli**: Her kullanıcı kendi API anahtarını kullanır
+- ✅ **Güvenli Deployment**: Vercel/Netlify'de yayınlamak güvenlidir
+- ⚠️ **Önemli**: Halka açık bilgisayarlarda kullanırken tarayıcı verilerini temizleyin
+
+## 💾 Veri Yönetimi
+
+### IndexedDB Kullanımı
+
+- **Dosyalar**: `files` tablosunda (binary data + metadata)
+- **Chunk'lar**: `chunks` tablosunda (önbellek için)
+- **Konuşmalar**: localStorage (eski sistem ile uyumlu)
+- **Ayarlar**: localStorage
+
+### Verileri Temizleme
+
+Tarayıcı Developer Tools (F12) → Application/Storage:
+```javascript
+// Tüm verileri sil
+localStorage.clear()
+indexedDB.deleteDatabase('AnswerAI')
+location.reload()
+```
 
 ## 🆘 Sorun Giderme
 
-
 ### "API key not configured" hatası
-- `.env` dosyasının oluşturulduğundan emin olun
-- `VITE_` ön ekinin kullanıldığını kontrol edin
-- Sunucuyu yeniden başlatın
+- Ayarlar panelinden API anahtarınızı girin
+- Sayfayı yenileyin
 
-### PDF yükleme hatası
-- Dosyanın geçerli bir PDF olduğunu kontrol edin (taranmış resim olmamalı)
-- Dosya boyutunun 10MB altında olduğunu doğrulayın
+### Dosya yükleme hatası
+- Dosyanın geçerli PDF/DOCX olduğunu kontrol edin
+- Boyutun 10MB altında olduğunu doğrulayın
+- IndexedDB kotasını kontrol edin (Settings'ten)
+
+### "QuotaExceededError"
+- IndexedDB kotası dolu
+- Eski dosyaları silin
+- Tarayıcı ayarlarından daha fazla alan verin
 
 ### Yavaş cevap süreleri
 - İnternet bağlantınızı kontrol edin
-- Aktif dosya sayısını azaltmayı deneyin
+- Chunk boyutunu ayarlayın (Settings)
+- Aktif dosya sayısını azaltın
 
-### Build hatası alıyorum
-- `node_modules` klasörünü silin ve `npm install` yapın
-- Node.js versiyonunun 18+ olduğunu kontrol edin
-- `.env` dosyasının doğru formatta olduğunu kontrol edin
-- Browser console'da hata mesajlarını inceleyin
+### Build hatası
+- `node_modules` silin ve `npm install` yapın
+- Node.js 18+ olduğunu kontrol edin
+- Cache temizleme: `npm run build -- --force`
 
----
+## 📊 Performans
 
+**Optimizasyonlar:**
+- ✅ Lazy loading (PDF/DOCX viewers)
+- ✅ Code splitting (vendor chunks)
+- ✅ Chunk caching (IndexedDB)
+- ✅ Asset optimization
+- ✅ Modern ES2015+ build

@@ -1,28 +1,54 @@
 # Netlify Build Configuration
+
 [build]
   command = "npm run build"
   publish = "dist"
 
-# SPA Redirect Rules
+# SPA Redirect Rules - tüm route'lar index.html'e yönlendirilir
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
 
-# Headers for Security and Performance
+# Security Headers
+[[headers]]
+  for = "/*"
+  [headers.values]
+    # CSP - Gemini API ve geliştirme için gerekli ayarlar
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://generativelanguage.googleapis.com; worker-src 'self' blob:;"
+    # Güvenlik başlıkları
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    # HTTPS zorlama (production için)
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains"
+
+# Asset Caching - Static dosyalar için agresif cache
 [[headers]]
   for = "/assets/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
+# HTML için minimal cache
 [[headers]]
-  for = "/*"
+  for = "/*.html"
   [headers.values]
-    X-Frame-Options = "DENY"
-    X-Content-Type-Options = "nosniff"
-    X-XSS-Protection = "1; mode=block"
-    Referrer-Policy = "strict-origin-when-cross-origin"
+    Cache-Control = "public, max-age=0, must-revalidate"
 
-# Environment Variables (example - set these in Netlify UI)
+# Service Worker cache
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+# PDF.js worker dosyaları
+[[headers]]
+  for = "*.worker.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Environment Variables - Artık gerekli değil!
+# API anahtarı UI üzerinden girilir (BYOK modeli)
 # [build.environment]
-#   VITE_GEMINI_API_KEY = "your-api-key-here"
+#   # Herhangi bir env variable eklemenize gerek yok

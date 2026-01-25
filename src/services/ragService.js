@@ -1,5 +1,6 @@
 import { createEmbedding, generateResponse } from './geminiService'
 import { getCachedChunks, setCachedChunks } from './chunkCacheService'
+import { loadSettings } from './settingsStorage'
 
 // In-memory vector store
 let documentChunks = []
@@ -58,8 +59,12 @@ function cosineSimilarity(vecA, vecB) {
  */
 export async function processDocument(text, fileId, fileName, pages = []) {
     try {
+        const settings = loadSettings()
+        const chunkSize = settings.chunkSize
+        const overlap = settings.chunkOverlap
+
         // Check cache first
-        const cachedChunks = getCachedChunks(fileId, 1000, 200)
+        const cachedChunks = await getCachedChunks(fileId, chunkSize, overlap)
         if (cachedChunks && cachedChunks.length > 0) {
             console.log(`✅ Using cached chunks for ${fileName} (${cachedChunks.length} chunks)`)
             // Replace existing chunks from this file
@@ -69,7 +74,7 @@ export async function processDocument(text, fileId, fileName, pages = []) {
         }
 
         // Split into chunks
-        const chunks = splitTextIntoChunks(text)
+        const chunks = splitTextIntoChunks(text, chunkSize, overlap)
 
         console.log(`📄 Processing ${chunks.length} chunks from ${fileName}`)
 
@@ -136,7 +141,7 @@ export async function processDocument(text, fileId, fileName, pages = []) {
         documentChunks.push(...processedChunks)
 
         // Cache the processed chunks
-        setCachedChunks(fileId, processedChunks, 1000, 200)
+        await setCachedChunks(fileId, processedChunks, chunkSize, overlap)
 
         console.log(`✅ Processed ${processedChunks.length} chunks with embeddings`)
 
@@ -154,8 +159,12 @@ export async function processDocument(text, fileId, fileName, pages = []) {
  * @param {number} topK - Number of chunks to retrieve
  * @returns {Promise<Object>} - Retrieved context and sources
  */
-export async function retrieveContext(query, activeFileIds, minSimilarity = 0.4) {
+export async function retrieveContext(query, activeFileIds) {
     try {
+        const settings = loadSettings()
+        const topK = settings.topK
+        const minSimilarity = 0.4  // Fixed threshold
+
         // Filter chunks from active files only
         const activeChunks = documentChunks.filter(chunk =>
             activeFileIds.includes(chunk.fileId)
@@ -187,8 +196,8 @@ export async function retrieveContext(query, activeFileIds, minSimilarity = 0.4)
             relevantChunks = [sortedChunks[0]]
         }
 
-        // Limit to max 5 to avoid overwhelming context
-        const topChunks = relevantChunks.slice(0, 5)
+        // Limit based on user's topK setting
+        const topChunks = relevantChunks.slice(0, topK)
 
         console.log(`📊 Selected ${topChunks.length} relevant chunks (threshold: ${minSimilarity})`)
         console.log('📊 Similarity scores:', topChunks.map(c => c.similarity.toFixed(3)))

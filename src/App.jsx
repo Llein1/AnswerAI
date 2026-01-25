@@ -13,12 +13,16 @@ import ToastContainer from './components/ToastContainer'
 const PDFViewer = lazy(() => import('./components/PDFViewer'))
 const DOCXViewer = lazy(() => import('./components/DOCXViewer'))
 import SearchResults from './components/SearchResults'
+import Settings from './components/Settings'
 import { ChevronDown } from 'lucide-react'
 import { processFile } from './services/fileProcessingService'
 import { generateRAGResponse } from './services/ragService'
 import * as ConvStorage from './services/conversationStorage'
 import * as FileStorage from './services/fileStorage'
 import { searchConversations, debounce, invalidateSearchCache } from './services/searchService'
+import { loadSettings, saveSettings as saveSettingsToStorage } from './services/settingsStorage'
+import { clearVectorStore } from './services/ragService'
+
 import { ToastProvider, useToast } from './hooks/useToast.jsx'
 
 function AppContent() {
@@ -53,26 +57,56 @@ function AppContent() {
         conversationIds: [],
         messageType: 'all'
     })
+    const [filterPanelOpen, setFilterPanelOpen] = useState(false)
+
+    // Settings state
+    const [settingsOpen, setSettingsOpen] = useState(false)
+    const [settings, setSettings] = useState(loadSettings())
+
+
 
     // Load conversations and files on mount
     useEffect(() => {
-        // Load files first
-        const savedFiles = FileStorage.loadFiles()
-        setFiles(savedFiles)
-        console.log(`Loaded ${savedFiles.length} files from storage`)
+        const initializeApp = async () => {
 
-        // Load conversations
-        const convs = ConvStorage.getConversationsInOrder()
-        setConversations(convs)
+            // Load files (now async)
+            try {
+                const savedFiles = await FileStorage.loadFiles()
+                setFiles(savedFiles)
+                console.log(`Loaded ${savedFiles.length} files from storage`)
+            } catch (error) {
+                console.error('Error loading files:', error)
+                showError('Dosyalar yüklenirken hata oluştu')
+            }
 
-        const activeId = ConvStorage.getActiveConversationId()
-        if (activeId) {
-            loadConversation(activeId)
-        } else if (convs.length > 0) {
-            loadConversation(convs[0].id)
+            // Load conversations
+            const convs = ConvStorage.getConversationsInOrder()
+            setConversations(convs)
+
+            const activeId = ConvStorage.getActiveConversationId()
+            if (activeId) {
+                loadConversation(activeId)
+            } else if (convs.length > 0) {
+                loadConversation(convs[0].id)
+            } else {
+                handleNewConversation()
+            }
+        }
+
+        initializeApp()
+    }, [])
+
+    // Check API key on mount
+    useEffect(() => {
+        const currentSettings = loadSettings()
+        if (!currentSettings.apiKey || currentSettings.apiKey.trim() === '') {
+            // Open settings modal automatically if no API key
+            setTimeout(() => {
+                setSettingsOpen(true)
+                showError('Lütfen Gemini API anahtarınızı yapılandırın')
+            }, 500)
         } else {
-            // Create first conversation
-            handleNewConversation()
+            console.log('✅ API key configured')
         }
     }, [])
 
@@ -120,12 +154,18 @@ function AppContent() {
                 uploadedAt: new Date().toISOString()
             }
 
-            // Save to localStorage
-            const saved = FileStorage.saveFile(newFile)
-            if (saved) {
-                setFiles(prev => [...prev, newFile])
-            } else {
-                throw new Error('Dosya depolama alanına kaydedilemedi')
+            // Save to storage (now async)
+            try {
+                const saved = await FileStorage.saveFile(newFile)
+                if (saved) {
+                    setFiles(prev => [...prev, newFile])
+                    console.log(`File uploaded: ${newFile.name}`)
+                } else {
+                    showError('Dosya kaydedilemedi')
+                }
+            } catch (error) {
+                console.error('Error saving file:', error)
+                showError('Dosya kaydedilemedi')
             }
         } catch (err) {
             showError(err.message)
@@ -133,23 +173,33 @@ function AppContent() {
         }
     }
 
-    const handleFileDelete = (fileId) => {
-        FileStorage.deleteFile(fileId)
-        setFiles(prev => prev.filter(f => f.id !== fileId))
+    const handleDeleteFile = async (fileId) => {
+        try {
+            await FileStorage.deleteFile(fileId)
+            setFiles(prev => prev.filter(f => f.id !== fileId))
+
+            // Delete chunks from RAG
+            // (ragService maintains in-memory chunks)
+        } catch (error) {
+            console.error('Error deleting file:', error)
+            showError('Dosya silinemedi')
+        }
     }
 
-    const handleFileToggle = (fileId) => {
-        const updatedFiles = files.map(f =>
-            f.id === fileId ? { ...f, active: !f.active } : f
-        )
-
-        // Update localStorage
-        const toggledFile = updatedFiles.find(f => f.id === fileId)
-        if (toggledFile) {
-            FileStorage.updateFileActiveState(fileId, toggledFile.active)
+    const handleToggleFileActive = async (fileId) => {
+        try {
+            const fileToToggle = files.find(f => f.id === fileId)
+            if (fileToToggle) {
+                const updatedFiles = files.map(f =>
+                    f.id === fileId ? { ...f, active: !f.active } : f
+                )
+                await FileStorage.updateFileActiveState(fileId, !fileToToggle.active)
+                setFiles(updatedFiles)
+            }
+        } catch (error) {
+            console.error('Error toggling file:', error)
+            showError('Dosya durumu güncellenemedi')
         }
-
-        setFiles(updatedFiles)
     }
 
     const handleSendMessage = async (message) => {
@@ -284,6 +334,30 @@ function AppContent() {
             ConvStorage.saveConversation(updatedConv)
             setConversations(ConvStorage.getConversationsInOrder())
         }
+    }
+
+    // Settings handlers
+    const handleSaveSettings = (newSettings) => {
+        const oldSettings = settings
+
+        // Save to localStorage
+        const saved = saveSettingsToStorage(newSettings)
+        if (!saved) {
+            showError('Ayarlar kaydedilemedi')
+            return
+        }
+
+        setSettings(newSettings)
+        setSettingsOpen(false)
+
+        // Check if chunk size changed
+        if (oldSettings.chunkSize !== newSettings.chunkSize) {
+            // Clear vector store to force reprocessing
+            clearVectorStore()
+            showError('Chunk boyutu değişti. En iyi sonuçlar için dosyalarınızı yeniden yükleyin.')
+        }
+
+        console.log('✅ Settings saved:', newSettings)
     }
 
     // Search handlers
@@ -444,11 +518,13 @@ function AppContent() {
                         conversations={conversations}
                         onFilterChange={handleFilterChange}
                         onClearFilters={handleClearFilters}
+                        onFilterToggle={setFilterPanelOpen}
+                        onOpenSettings={() => setSettingsOpen(true)}
                     />
 
-                    {/* Search Results Dropdown */}
-                    {searchQuery && searchResults.length > 0 && (
-                        <div className="absolute left-1/2 -translate-x-1/2 top-full w-full max-w-2xl px-6">
+                    {/* Search Results Dropdown - Hidden when filter panel is open */}
+                    {searchQuery && searchResults.length > 0 && !filterPanelOpen && (
+                        <div className="absolute left-1/2 -translate-x-1/2 top-full w-full max-w-2xl px-6 z-50">
                             <SearchResults
                                 results={searchResults}
                                 query={searchQuery}
@@ -479,7 +555,7 @@ function AppContent() {
                 <div className={`w-80 bg-slate-800/50 border-r border-slate-700 flex flex-col overflow-hidden transition-transform duration-300 md:relative md:translate-x-0 ${sidebarOpen ? 'translate-x-0 fixed inset-y-0 left-0 z-40' : '-translate-x-full fixed'
                     }`}>
                     {/* Conversation List - Top Half */}
-                    <div className="min-h-0 border-b border-slate-700 flex flex-col max-h-[50vh]">
+                    <div className="min-h-0 border-b border-slate-700 flex flex-col max-h-[420px]">
                         <ConversationList
                             conversations={conversations}
                             activeId={activeConversationId}
@@ -495,8 +571,8 @@ function AppContent() {
                         <FileUpload onFileUpload={handleFileUpload} />
                         <FileList
                             files={files}
-                            onDelete={handleFileDelete}
-                            onToggle={handleFileToggle}
+                            onDelete={handleDeleteFile}
+                            onToggle={handleToggleFileActive}
                             onPreview={handlePreviewFile}
                         />
                     </div>
@@ -628,6 +704,16 @@ function AppContent() {
                 onConfirm={confirmClearChat}
                 onCancel={() => setClearChatDialogOpen(false)}
             />
+
+            {/* Settings Modal */}
+            {settingsOpen && (
+                <Settings
+                    isOpen={settingsOpen}
+                    currentSettings={settings}
+                    onSave={handleSaveSettings}
+                    onClose={() => setSettingsOpen(false)}
+                />
+            )}
         </Layout>
     )
 }

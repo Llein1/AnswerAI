@@ -1,15 +1,29 @@
 /**
  * File Storage Service
- * Manages persistence of uploaded PDF files in localStorage
+ * Manages persistence of uploaded PDF files using IndexedDB (via Dexie)
+ * Migrated from localStorage for better capacity and performance
  */
+
+import {
+    saveFileToIndexedDB,
+    loadFilesFromIndexedDB,
+    deleteFileFromIndexedDB,
+    clearAllFilesFromIndexedDB,
+    isIndexedDBAvailable,
+    getStorageInfo as getIndexedDBStorageInfo
+} from './indexedDBService'
+
+// Fallback to localStorage if IndexedDB not available
+const USE_INDEXEDDB = isIndexedDBAvailable()
+
+if (!USE_INDEXEDDB) {
+    console.warn('⚠️ IndexedDB not available, falling back to localStorage (limited capacity)')
+}
+
+// ===== localStorage FALLBACK (for old browsers) =====
 
 const FILES_STORAGE_KEY = 'answerai_files'
 
-/**
- * Convert ArrayBuffer to Base64 string
- * @param {ArrayBuffer} buffer - ArrayBuffer to convert
- * @returns {string} Base64 string
- */
 function arrayBufferToBase64(buffer) {
     const bytes = new Uint8Array(buffer)
     let binary = ''
@@ -19,11 +33,6 @@ function arrayBufferToBase64(buffer) {
     return btoa(binary)
 }
 
-/**
- * Convert Base64 string to ArrayBuffer
- * @param {string} base64 - Base64 string
- * @returns {ArrayBuffer} ArrayBuffer
- */
 function base64ToArrayBuffer(base64) {
     const binary = atob(base64)
     const bytes = new Uint8Array(binary.length)
@@ -33,18 +42,12 @@ function base64ToArrayBuffer(base64) {
     return bytes.buffer
 }
 
-/**
- * Load all files from localStorage
- * @returns {Array} Array of file objects
- */
-export function loadFiles() {
+function loadFilesFromLocalStorage() {
     try {
         const filesJson = localStorage.getItem(FILES_STORAGE_KEY)
         if (!filesJson) return []
 
         const files = JSON.parse(filesJson)
-
-        // Convert base64 data back to ArrayBuffer for each file
         const filesWithArrayBuffer = files.map(file => {
             if (file.dataBase64) {
                 return {
@@ -62,67 +65,44 @@ export function loadFiles() {
     }
 }
 
-/**
- * Save a file to localStorage
- * @param {Object} fileData - File object with metadata and content
- * @returns {boolean} Success status
- */
-export function saveFile(fileData) {
+function saveFileToLocalStorage(fileData) {
     try {
-        const files = loadFiles()
-
-        // Convert ArrayBuffer to base64 for storage
+        const files = loadFilesFromLocalStorage()
         const fileToSave = { ...fileData }
+
         if (fileData.data instanceof ArrayBuffer) {
             fileToSave.dataBase64 = arrayBufferToBase64(fileData.data)
-            delete fileToSave.data // Remove ArrayBuffer from object before saving
+            delete fileToSave.data
         }
 
-        // Check if file already exists (by ID)
         const existingIndex = files.findIndex(f => f.id === fileData.id)
-
         if (existingIndex >= 0) {
-            // Update existing file
-            const updatedFile = { ...files[existingIndex], ...fileToSave }
-            // Keep base64 data from fileToSave if present
-            files[existingIndex] = updatedFile
+            files[existingIndex] = { ...files[existingIndex], ...fileToSave }
         } else {
-            // Add new file
             files.push(fileToSave)
         }
 
-        // Create storage object without ArrayBuffer
         const filesToStore = files.map(f => {
             const { data, ...rest } = f
             return rest
         })
 
         localStorage.setItem(FILES_STORAGE_KEY, JSON.stringify(filesToStore))
-        console.log(`File saved: ${fileData.name} (${fileData.id})`)
         return true
     } catch (error) {
         if (error.name === 'QuotaExceededError') {
-            console.error('localStorage quota exceeded! Consider clearing old files.')
             alert('Depolama limiti doldu. Yeni dosya yüklemek için bazı dosyaları silin.')
-        } else {
-            console.error('Error saving file to localStorage:', error)
         }
+        console.error('Error saving file to localStorage:', error)
         return false
     }
 }
 
-/**
- * Delete a file from localStorage
- * @param {string} fileId - ID of file to delete
- * @returns {boolean} Success status
- */
-export function deleteFile(fileId) {
+function deleteFileFromLocalStorage(fileId) {
     try {
-        const files = loadFiles()
+        const files = loadFilesFromLocalStorage()
         const filteredFiles = files.filter(f => f.id !== fileId)
-
         localStorage.setItem(FILES_STORAGE_KEY, JSON.stringify(filteredFiles))
-        console.log(`File deleted: ${fileId}`)
         return true
     } catch (error) {
         console.error('Error deleting file from localStorage:', error)
@@ -130,20 +110,72 @@ export function deleteFile(fileId) {
     }
 }
 
+// ===== PUBLIC API (Auto-selects IndexedDB or localStorage) =====
+
+/**
+ * Load all files from storage
+ * @returns {Promise<Array>} Array of file objects
+ */
+export async function loadFiles() {
+    if (USE_INDEXEDDB) {
+        return await loadFilesFromIndexedDB()
+    } else {
+        return loadFilesFromLocalStorage()
+    }
+}
+
+/**
+ * Save a file to storage
+ * @param {Object} fileData - File object with metadata and content
+ * @returns {Promise<boolean>} Success status
+ */
+export async function saveFile(fileData) {
+    if (USE_INDEXEDDB) {
+        try {
+            await saveFileToIndexedDB(fileData)
+            return true
+        } catch (error) {
+            console.error('Error saving file:', error)
+            return false
+        }
+    } else {
+        return saveFileToLocalStorage(fileData)
+    }
+}
+
+/**
+ * Delete a file from storage
+ * @param {string} fileId - ID of file to delete
+ * @returns {Promise<boolean>} Success status
+ */
+export async function deleteFile(fileId) {
+    if (USE_INDEXEDDB) {
+        try {
+            await deleteFileFromIndexedDB(fileId)
+            return true
+        } catch (error) {
+            console.error('Error deleting file:', error)
+            return false
+        }
+    } else {
+        return deleteFileFromLocalStorage(fileId)
+    }
+}
+
 /**
  * Update the active state of a file
  * @param {string} fileId - ID of file to update
  * @param {boolean} active - New active state
- * @returns {boolean} Success status
+ * @returns {Promise<boolean>} Success status
  */
-export function updateFileActiveState(fileId, active) {
+export async function updateFileActiveState(fileId, active) {
     try {
-        const files = loadFiles()
-        const fileIndex = files.findIndex(f => f.id === fileId)
+        const files = await loadFiles()
+        const file = files.find(f => f.id === fileId)
 
-        if (fileIndex >= 0) {
-            files[fileIndex].active = active
-            localStorage.setItem(FILES_STORAGE_KEY, JSON.stringify(files))
+        if (file) {
+            file.active = active
+            await saveFile(file)
             console.log(`File ${fileId} active state updated to: ${active}`)
             return true
         }
@@ -156,49 +188,62 @@ export function updateFileActiveState(fileId, active) {
 }
 
 /**
- * Clear all files from localStorage
- * @returns {boolean} Success status
+ * Clear all files from storage
+ * @returns {Promise<boolean>} Success status
  */
-export function clearAllFiles() {
-    try {
-        localStorage.removeItem(FILES_STORAGE_KEY)
-        console.log('All files cleared from storage')
-        return true
-    } catch (error) {
-        console.error('Error clearing files:', error)
-        return false
+export async function clearAllFiles() {
+    if (USE_INDEXEDDB) {
+        try {
+            await clearAllFilesFromIndexedDB()
+            return true
+        } catch (error) {
+            console.error('Error clearing files:', error)
+            return false
+        }
+    } else {
+        try {
+            localStorage.removeItem(FILES_STORAGE_KEY)
+            return true
+        } catch (error) {
+            console.error('Error clearing files:', error)
+            return false
+        }
     }
 }
 
 /**
  * Get storage usage info
- * @returns {Object} Storage info with file count and estimated size
+ * @returns {Promise<Object>} Storage info with file count and estimated size
  */
-export function getStorageInfo() {
-    try {
-        const files = loadFiles()
-        const filesJson = localStorage.getItem(FILES_STORAGE_KEY) || '[]'
-        const sizeInBytes = new Blob([filesJson]).size
-        const sizeInMB = (sizeInBytes / (1024 * 1024)).toFixed(2)
+export async function getStorageInfo() {
+    if (USE_INDEXEDDB) {
+        return await getIndexedDBStorageInfo()
+    } else {
+        try {
+            const files = loadFilesFromLocalStorage()
+            const filesJson = localStorage.getItem(FILES_STORAGE_KEY) || '[]'
+            const sizeInBytes = new Blob([filesJson]).size
+            const sizeInMB = (sizeInBytes / (1024 * 1024)).toFixed(2)
 
-        return {
-            fileCount: files.length,
-            sizeInBytes: sizeInBytes,
-            sizeInMB: sizeInMB,
-            files: files.map(f => ({
-                id: f.id,
-                name: f.name,
-                size: f.size,
-                active: f.active
-            }))
-        }
-    } catch (error) {
-        console.error('Error getting storage info:', error)
-        return {
-            fileCount: 0,
-            sizeInBytes: 0,
-            sizeInMB: '0.00',
-            files: []
+            return {
+                fileCount: files.length,
+                sizeInBytes: sizeInBytes,
+                sizeInMB: sizeInMB,
+                files: files.map(f => ({
+                    id: f.id,
+                    name: f.name,
+                    size: f.size,
+                    active: f.active
+                }))
+            }
+        } catch (error) {
+            console.error('Error getting storage info:', error)
+            return {
+                fileCount: 0,
+                sizeInBytes: 0,
+                sizeInMB: '0.00',
+                files: []
+            }
         }
     }
 }

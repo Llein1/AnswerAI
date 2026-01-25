@@ -1,26 +1,28 @@
 import { ChatGoogleGenerativeAI } from '@langchain/google-genai'
+import { loadSettings } from './settingsStorage'
 
-// Initialize with API key
-const API_KEY = import.meta.env.VITE_GEMINI_API_KEY
+/**
+ * Get or create ChatGoogleGenerativeAI model instance with current settings
+ * @returns {ChatGoogleGenerativeAI} - Configured chat model
+ */
+function getChatModel() {
+    const settings = loadSettings()
 
-if (!API_KEY) {
-    console.error('VITE_GEMINI_API_KEY is not set in environment variables')
-}
+    if (!settings.apiKey) {
+        throw new Error('Gemini API anahtarı yapılandırılmamış. Lütfen Ayarlar menüsünden API anahtarınızı girin.')
+    }
 
-// Initialize LangChain's Google GenAI client
-let chatModel = null
-
-if (API_KEY) {
     try {
-        chatModel = new ChatGoogleGenerativeAI({
-            apiKey: API_KEY,
-            modelName: 'gemini-2.5-flash', // Updated to latest Gemini 2.5 Flash
-            temperature: 0.7,
+        const model = new ChatGoogleGenerativeAI({
+            apiKey: settings.apiKey,
+            modelName: settings.model,
+            temperature: settings.temperature,
             maxOutputTokens: 2048,
         })
-        console.log('✅ ChatGoogleGenerativeAI initialized with gemini-2.5-flash')
+        return model
     } catch (error) {
         console.error('Failed to initialize ChatGoogleGenerativeAI:', error)
+        throw new Error('Gemini modeli başlatılamadı: ' + error.message)
     }
 }
 
@@ -30,8 +32,10 @@ if (API_KEY) {
  * @returns {Promise<number[]>} - Embedding vector
  */
 export async function createEmbedding(text) {
-    if (!API_KEY) {
-        throw new Error('Gemini API anahtarı yapılandırılmamış. Lütfen .env dosyasında VITE_GEMINI_API_KEY ayarını kontrol edin')
+    const settings = loadSettings()
+
+    if (!settings.apiKey) {
+        throw new Error('Gemini API anahtarı yapılandırılmamış. Lütfen Ayarlar menüsünden API anahtarınızı girin.')
     }
 
     try {
@@ -39,7 +43,7 @@ export async function createEmbedding(text) {
         const { GoogleGenerativeAIEmbeddings } = await import('@langchain/google-genai')
 
         const embeddings = new GoogleGenerativeAIEmbeddings({
-            apiKey: API_KEY,
+            apiKey: settings.apiKey,
             modelName: 'text-embedding-004', // Latest embedding model
         })
 
@@ -59,9 +63,7 @@ export async function createEmbedding(text) {
  * @returns {Promise<string>} - Generated response
  */
 export async function generateResponse(prompt, context, documentMetadata = {}) {
-    if (!chatModel) {
-        throw new Error('Gemini API anahtarı yapılandırılmamış. Lütfen .env dosyasında VITE_GEMINI_API_KEY ayarını kontrol edin')
-    }
+    const chatModel = getChatModel()
 
     try {
         const fullPrompt = buildRAGPrompt(context, prompt, documentMetadata)
@@ -79,7 +81,7 @@ export async function generateResponse(prompt, context, documentMetadata = {}) {
         console.error('Generation error:', error)
 
         if (error.message?.includes('API key') || error.message?.includes('401')) {
-            throw new Error('Geçersiz API anahtarı. Lütfen VITE_GEMINI_API_KEY değerini kontrol edin')
+            throw new Error('Geçersiz API anahtarı. Lütfen Ayarlar menüsünden API anahtarınızı kontrol edin')
         }
 
         if (error.message?.includes('quota') || error.message?.includes('429')) {

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { Search, X, Filter } from 'lucide-react'
 import FilterPanel from './FilterPanel'
 
-export default function SearchBar({ onSearch, onClear, resultCount, filters, conversations, onFilterChange, onClearFilters }) {
+export default function SearchBar({ onSearch, onClear, resultCount, filters, conversations, onFilterChange, onClearFilters, onFilterToggle }) {
     const [query, setQuery] = useState('')
     const [isExpanded, setIsExpanded] = useState(false)
     const [showFilters, setShowFilters] = useState(false)
@@ -98,7 +98,11 @@ export default function SearchBar({ onSearch, onClear, resultCount, filters, con
                     {/* Filter Button */}
                     <div className="relative" ref={filterRef}>
                         <button
-                            onClick={() => setShowFilters(!showFilters)}
+                            onClick={() => {
+                                const newState = !showFilters
+                                setShowFilters(newState)
+                                onFilterToggle?.(newState)
+                            }}
                             className={`p-1 rounded transition-colors relative ${showFilters ? 'bg-primary-500/20 text-primary-400' : 'hover:bg-slate-700 text-gray-400'
                                 }`}
                             title="Filtreler"

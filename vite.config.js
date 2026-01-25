@@ -13,7 +13,11 @@ export default defineConfig({
   // Development server configuration
   server: {
     port: 5173,
-    open: true
+    open: true,
+    // Configure headers to allow eval for Vite HMR
+    headers: {
+      'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://generativelanguage.googleapis.com ws: wss:;"
+    }
   },
 
   // Production build optimizations
