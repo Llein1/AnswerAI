@@ -45,26 +45,38 @@ export async function createEmbedding(text) {
  */
 export async function createEmbeddings(texts) {
     if (!texts || texts.length === 0) return []
-    const BATCH_SIZE = 20          // Conservative batch size to avoid 429
-    const DELAY_BETWEEN_BATCHES_MS = 1000  // 1s delay between batches
+
+    // Gemini embedding free tier limits:
+    // - 30,000 tokens/min (TPM)
+    // - 100 requests/min (RPM)
+    const FREE_TIER_TPM = 30000
+    const AVG_CHARS_PER_TOKEN = 4
+    const BATCH_SIZE = 10  // Small batches to keep each request light
 
     const embeddings = await _getEmbeddingsModel()
     const results = []
-
     const totalBatches = Math.ceil(texts.length / BATCH_SIZE)
+
     console.log(`⚡ Batch embedding: ${texts.length} chunk, ${totalBatches} grup halinde gönderiliyor (${BATCH_SIZE}/grup)`)
 
     for (let i = 0; i < texts.length; i += BATCH_SIZE) {
         const batch = texts.slice(i, i + BATCH_SIZE)
         const batchNum = Math.floor(i / BATCH_SIZE) + 1
-        console.log(`  📦 Grup ${batchNum}/${totalBatches}: ${batch.length} chunk gönderiliyor`)
+
+        // Estimate tokens in this batch to compute required delay
+        const batchTokenEstimate = batch.reduce((sum, t) => sum + Math.ceil(t.length / AVG_CHARS_PER_TOKEN), 0)
+        // How many ms must pass so we stay under TPM?
+        // delay = (batchTokens / TPM) * 60_000 ms, minimum 500ms
+        const requiredDelayMs = Math.max(500, Math.ceil((batchTokenEstimate / FREE_TIER_TPM) * 60000))
+
+        console.log(`  📦 Grup ${batchNum}/${totalBatches}: ${batch.length} chunk (~${batchTokenEstimate} token) → ${requiredDelayMs}ms bekleniyor`)
 
         const batchEmbeddings = await embeddings.embedDocuments(batch)
         results.push(...batchEmbeddings)
 
-        // Short delay between batches to respect rate limits
+        // Wait proportional to token count to respect TPM limit
         if (i + BATCH_SIZE < texts.length) {
-            await new Promise(resolve => setTimeout(resolve, DELAY_BETWEEN_BATCHES_MS))
+            await new Promise(resolve => setTimeout(resolve, requiredDelayMs))
         }
     }
 
