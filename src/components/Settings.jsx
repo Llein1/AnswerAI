@@ -237,8 +237,9 @@ export default function Settings({ isOpen, currentSettings, onSave, onClose }) {
                                 className="w-full px-4 py-3 bg-slate-900 border border-slate-600 rounded-lg text-gray-200
                                          focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500"
                             >
-                                <option value="gemini-3-flash-preview">Gemini 3 Flash (En Yeni ve Hızlı)</option>
-                                <option value="gemini-2.5-flash">Gemini 2.5 Flash (Dengeli - Önerilen)</option>
+                                <option value="gemini-3.1-flash-lite-preview">Gemini 3.1 Flash-Lite (Yeni - Hızlı)</option>
+                                <option value="gemini-3-flash-preview">Gemini 3 Flash (Dengeli ve Hızlı)</option>
+                                <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
                                 <option value="gemini-2.5-flash-lite">Gemini 2.5 Flash-Lite (Ekonomik)</option>
                                 <option value="gemma-3-27b-it">Gemma 3 27B (En Ekonomik)</option>
                             </select>

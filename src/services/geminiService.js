@@ -44,7 +44,7 @@ export async function createEmbedding(text) {
 
         const embeddings = new GoogleGenerativeAIEmbeddings({
             apiKey: settings.apiKey,
-            modelName: 'text-embedding-004', // Latest embedding model
+            modelName: 'gemini-embedding-2-preview', // Latest embedding model
         })
 
         const embedding = await embeddings.embedQuery(text)
