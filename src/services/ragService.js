@@ -155,6 +155,20 @@ export async function processDocument(text, fileId, fileName, pages = []) {
         // Cache the processed chunks
         await setCachedChunks(fileId, processedChunks, chunkSize, overlap)
 
+        // Validate embedding quality
+        const validChunks = processedChunks.filter(c => c.embedding && c.embedding.length > 0)
+        const firstEmb = validChunks[0]?.embedding
+        if (firstEmb) {
+            const dim = firstEmb.length
+            const magnitude = Math.sqrt(firstEmb.reduce((sum, v) => sum + v * v, 0))
+            const hasNonZero = firstEmb.some(v => v !== 0)
+            console.log(`🔬 Embedding doğrulama:`)
+            console.log(`   ✅ Geçerli chunk sayısı: ${validChunks.length}/${processedChunks.length}`)
+            console.log(`   ✅ Vektör boyutu: ${dim} boyut (beklenen: >100)`)
+            console.log(`   ✅ Büyüklük (magnitude): ${magnitude.toFixed(4)} (0 değilse geçerli)`)
+            console.log(`   ✅ Sıfırdan farklı değer var mı: ${hasNonZero}`)
+        }
+
         console.log(`✅ Processed ${processedChunks.length} chunks with embeddings`)
 
         return processedChunks.length

@@ -45,8 +45,8 @@ export async function createEmbedding(text) {
  */
 export async function createEmbeddings(texts) {
     if (!texts || texts.length === 0) return []
-    const BATCH_SIZE = 30 // Gemini embedding API limit per request
-    const DELAY_BETWEEN_BATCHES_MS = 200
+    const BATCH_SIZE = 20          // Conservative batch size to avoid 429
+    const DELAY_BETWEEN_BATCHES_MS = 1000  // 1s delay between batches
 
     const embeddings = await _getEmbeddingsModel()
     const results = []
