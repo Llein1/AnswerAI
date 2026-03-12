@@ -67,9 +67,12 @@ export async function createEmbeddings(texts) {
         const batchTokenEstimate = batch.reduce((sum, t) => sum + Math.ceil(t.length / AVG_CHARS_PER_TOKEN), 0)
         // How many ms must pass so we stay under TPM?
         // delay = (batchTokens / TPM) * 60_000 ms, minimum 500ms
-        const requiredDelayMs = Math.max(500, Math.ceil((batchTokenEstimate / FREE_TIER_TPM) * 60000))
+        const baseDelayMs = Math.ceil((batchTokenEstimate / FREE_TIER_TPM) * 60000)
+        
+        // Add %15 safety margin (hata payı) to the base delay
+        const requiredDelayMs = Math.max(500, Math.ceil(baseDelayMs * 1.15))
 
-        console.log(`  📦 Grup ${batchNum}/${totalBatches}: ${batch.length} chunk (~${batchTokenEstimate} token) → ${requiredDelayMs}ms bekleniyor`)
+        console.log(`  📦 Grup ${batchNum}/${totalBatches}: ${batch.length} chunk (~${batchTokenEstimate} token) → ${requiredDelayMs}ms bekleniyor (Hata payı dahil)`)
 
         const batchEmbeddings = await embeddings.embedDocuments(batch)
         results.push(...batchEmbeddings)
