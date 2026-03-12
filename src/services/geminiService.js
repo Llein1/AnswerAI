@@ -38,16 +38,38 @@ export async function createEmbedding(text) {
 }
 
 /**
- * Generate embeddings for multiple texts in a single batch API call
+ * Generate embeddings for multiple texts using chunked mini-batches
+ * Sends BATCH_SIZE texts per API call to avoid 429 rate limit errors
  * @param {string[]} texts - Array of texts to embed
  * @returns {Promise<number[][]>} - Array of embedding vectors
  */
 export async function createEmbeddings(texts) {
     if (!texts || texts.length === 0) return []
+    const BATCH_SIZE = 30 // Gemini embedding API limit per request
+    const DELAY_BETWEEN_BATCHES_MS = 200
+
     const embeddings = await _getEmbeddingsModel()
-    console.log(`⚡ Batch embedding: ${texts.length} chunk tek API çağrısında gönderiliyor`)
-    const result = await embeddings.embedDocuments(texts)
-    return result
+    const results = []
+
+    const totalBatches = Math.ceil(texts.length / BATCH_SIZE)
+    console.log(`⚡ Batch embedding: ${texts.length} chunk, ${totalBatches} grup halinde gönderiliyor (${BATCH_SIZE}/grup)`)
+
+    for (let i = 0; i < texts.length; i += BATCH_SIZE) {
+        const batch = texts.slice(i, i + BATCH_SIZE)
+        const batchNum = Math.floor(i / BATCH_SIZE) + 1
+        console.log(`  📦 Grup ${batchNum}/${totalBatches}: ${batch.length} chunk gönderiliyor`)
+
+        const batchEmbeddings = await embeddings.embedDocuments(batch)
+        results.push(...batchEmbeddings)
+
+        // Short delay between batches to respect rate limits
+        if (i + BATCH_SIZE < texts.length) {
+            await new Promise(resolve => setTimeout(resolve, DELAY_BETWEEN_BATCHES_MS))
+        }
+    }
+
+    console.log(`✅ Tüm embedding'ler tamamlandı: ${results.length} chunk`)
+    return results
 }
 
 /**
