@@ -27,11 +27,33 @@ function getChatModel() {
 }
 
 /**
- * Generate embeddings for text using Gemini
+ * Generate embedding for a single text using Gemini
  * @param {string} text - Text to embed
  * @returns {Promise<number[]>} - Embedding vector
  */
 export async function createEmbedding(text) {
+    const embeddings = await _getEmbeddingsModel()
+    const embedding = await embeddings.embedQuery(text)
+    return embedding
+}
+
+/**
+ * Generate embeddings for multiple texts in a single batch API call
+ * @param {string[]} texts - Array of texts to embed
+ * @returns {Promise<number[][]>} - Array of embedding vectors
+ */
+export async function createEmbeddings(texts) {
+    if (!texts || texts.length === 0) return []
+    const embeddings = await _getEmbeddingsModel()
+    console.log(`⚡ Batch embedding: ${texts.length} chunk tek API çağrısında gönderiliyor`)
+    const result = await embeddings.embedDocuments(texts)
+    return result
+}
+
+/**
+ * Internal: create and return an embeddings model instance
+ */
+async function _getEmbeddingsModel() {
     const settings = loadSettings()
 
     if (!settings.apiKey) {
@@ -39,19 +61,14 @@ export async function createEmbedding(text) {
     }
 
     try {
-        // Use LangChain's embeddings model
         const { GoogleGenerativeAIEmbeddings } = await import('@langchain/google-genai')
-
-        const embeddings = new GoogleGenerativeAIEmbeddings({
+        return new GoogleGenerativeAIEmbeddings({
             apiKey: settings.apiKey,
-            modelName: 'gemini-embedding-2-preview', // Latest embedding model
+            modelName: 'gemini-embedding-2-preview',
         })
-
-        const embedding = await embeddings.embedQuery(text)
-        return embedding
     } catch (error) {
-        console.error('Embedding error:', error)
-        throw new Error(`Embedding oluşturulurken hata: ${error.message}`)
+        console.error('Embedding model init error:', error)
+        throw new Error(`Embedding modeli başlatılamadı: ${error.message}`)
     }
 }
 

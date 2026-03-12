@@ -1,4 +1,4 @@
-import { createEmbedding, generateResponse } from './geminiService'
+import { createEmbedding, createEmbeddings, generateResponse } from './geminiService'
 import { getCachedChunks, setCachedChunks } from './chunkCacheService'
 import { loadSettings } from './settingsStorage'
 
@@ -107,32 +107,44 @@ export async function processDocument(text, fileId, fileName, pages = []) {
             return pageNumbers.length > 0 ? pageNumbers : null
         }
 
-        // Create embeddings for each chunk
+        // Create embeddings for ALL chunks in a single batch API call
         const processedChunks = []
 
-        for (let i = 0; i < chunks.length; i++) {
-            try {
-                console.log(`⚙️ Creating embedding for chunk ${i + 1}/${chunks.length}`)
-                const embedding = await createEmbedding(chunks[i])
+        try {
+            console.log(`⚡ Batch embedding başlatılıyor: ${chunks.length} chunk tek seferde gönderiliyor`)
+            const allEmbeddings = await createEmbeddings(chunks)
 
+            for (let i = 0; i < chunks.length; i++) {
                 const pageNumbers = findChunkPages(chunks[i])
-
                 processedChunks.push({
                     id: `${fileId}_chunk_${i}`,
                     fileId,
                     fileName,
                     text: chunks[i],
-                    embedding,
+                    embedding: allEmbeddings[i],
                     chunkIndex: i,
-                    pageNumbers: pageNumbers  // Array of page numbers this chunk appears in
+                    pageNumbers: pageNumbers
                 })
-
-                // Small delay to avoid rate limiting
-                if (i < chunks.length - 1) {
-                    await new Promise(resolve => setTimeout(resolve, 100))
+            }
+        } catch (error) {
+            console.error('Batch embedding başarısız, tek tek deneniyor:', error)
+            // Fallback: process one by one if batch fails
+            for (let i = 0; i < chunks.length; i++) {
+                try {
+                    const embedding = await createEmbedding(chunks[i])
+                    const pageNumbers = findChunkPages(chunks[i])
+                    processedChunks.push({
+                        id: `${fileId}_chunk_${i}`,
+                        fileId,
+                        fileName,
+                        text: chunks[i],
+                        embedding,
+                        chunkIndex: i,
+                        pageNumbers: pageNumbers
+                    })
+                } catch (chunkError) {
+                    console.error(`Chunk ${i} işlenemedi:`, chunkError)
                 }
-            } catch (error) {
-                console.error(`Failed to process chunk ${i}:`, error)
             }
         }
 
@@ -253,23 +265,17 @@ export async function generateRAGResponse(question, activeFiles) {
         console.log(`💬 Generating RAG response for: "${question}"`)
         console.log(`📁 Active files: ${activeFiles.map(f => f.name).join(', ')}`)
 
-        // Process any files that haven't been processed yet
+        // Verify all active files have been processed (embedding should happen on upload)
         for (const file of activeFiles) {
             const existingChunks = documentChunks.filter(chunk => chunk.fileId === file.id)
+            const hasValidEmbeddings = existingChunks.length > 0 && existingChunks[0].embedding
 
-            // Check if file needs (re)processing
-            const needsProcessing = existingChunks.length === 0 ||
-                !existingChunks[0].embedding // Old chunks without embeddings
-
-            if (needsProcessing) {
-                if (existingChunks.length > 0) {
-                    console.log(`🔄 Re-processing ${file.name} to add embeddings...`)
-                } else {
-                    console.log(`📄 Processing file: ${file.name}`)
-                }
+            if (!hasValidEmbeddings) {
+                // Fallback: process if somehow not embedded yet (e.g. page refresh)
+                console.log(`⚠️ ${file.name} henüz işlenmemiş, şimdi işleniyor...`)
                 await processDocument(file.text, file.id, file.name, file.pages)
             } else {
-                console.log(`✓ File already processed: ${file.name} (${existingChunks.length} chunks with embeddings)`)
+                console.log(`✓ ${file.name} hazır (${existingChunks.length} chunk)`)
             }
         }
 

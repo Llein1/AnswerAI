@@ -16,7 +16,7 @@ import SearchResults from './components/SearchResults'
 import Settings from './components/Settings'
 import { ChevronDown } from 'lucide-react'
 import { processFile } from './services/fileProcessingService'
-import { generateRAGResponse } from './services/ragService'
+import { generateRAGResponse, processDocument } from './services/ragService'
 import * as ConvStorage from './services/conversationStorage'
 import * as FileStorage from './services/fileStorage'
 import { searchConversations, debounce, invalidateSearchCache } from './services/searchService'
@@ -30,6 +30,7 @@ function AppContent() {
     const [messages, setMessages] = useState([])
     const [isLoading, setIsLoading] = useState(false)
     const [sidebarOpen, setSidebarOpen] = useState(false)
+    const [processingFiles, setProcessingFiles] = useState(new Set()) // tracks files being embedded
     const { toasts, removeToast, showError } = useToast()
 
     // Conversation management
@@ -160,6 +161,23 @@ function AppContent() {
                 if (saved) {
                     setFiles(prev => [...prev, newFile])
                     console.log(`File uploaded: ${newFile.name}`)
+
+                    // Trigger embedding immediately in background (embed on upload)
+                    setProcessingFiles(prev => new Set([...prev, newFile.id]))
+                    processDocument(newFile.text, newFile.id, newFile.name, newFile.pages || [])
+                        .then(count => {
+                            console.log(`✅ Embedding tamamlandı: ${newFile.name} (${count} chunk)`)
+                        })
+                        .catch(err => {
+                            console.warn(`⚠️ Embedding başarısız (${newFile.name}):`, err.message)
+                        })
+                        .finally(() => {
+                            setProcessingFiles(prev => {
+                                const next = new Set(prev)
+                                next.delete(newFile.id)
+                                return next
+                            })
+                        })
                 } else {
                     showError('Dosya kaydedilemedi')
                 }
@@ -574,6 +592,7 @@ function AppContent() {
                             onDelete={handleDeleteFile}
                             onToggle={handleToggleFileActive}
                             onPreview={handlePreviewFile}
+                            processingFiles={processingFiles}
                         />
                     </div>
                 </div>
