@@ -149,7 +149,7 @@ Uygulamanın özelliklerini gösteren arayüz görünümü:
    - "Hangi belgede X konusu daha detaylı?"
    ```
 
-## 🛠️ Teknoloji Yığını
+## 🛠️ Kullanılan Teknolojiler
 
 | Kategori | Teknoloji |
 |----------|-----------|
@@ -158,8 +158,8 @@ Uygulamanın özelliklerini gösteren arayüz görünümü:
 | **Veritabanı** | IndexedDB (Dexie.js) |
 | **PDF İşleme** | PDF.js (Mozilla) |
 | **DOCX İşleme** | Mammoth.js |
-| **AI/LLM** | Google Gemini 2.5 Flash |
-| **Embeddings** | Gemini text-embedding-004 |
+| **AI/LLM** | Google Gemini (Ayarlardan model seçilebilir) |
+| **Embeddings** | gemini-embedding-2 |
 | **RAG Pipeline** | LangChain + Özel vektör arama |
 | **State Yönetimi** | React Hooks |
 | **İkonlar** | Lucide React |
@@ -252,7 +252,6 @@ Canlı ortam kurulumu için detaylı talimatlar: **[DEPLOYMENT.md](DEPLOYMENT.md
 
 Tarayıcı Developer Tools (F12) → Application/Storage:
 ```javascript
-// Tüm verileri sil
 localStorage.clear()
 indexedDB.deleteDatabase('AnswerAI')
 location.reload()
@@ -283,12 +282,3 @@ location.reload()
 - `node_modules` silin ve `npm install` yapın
 - Node.js 18+ olduğunu kontrol edin
 - Cache temizleme: `npm run build -- --force`
-
-## 📊 Performans
-
-**Optimizasyonlar:**
-- ✅ Lazy loading (PDF/DOCX viewers)
-- ✅ Code splitting (vendor chunks)
-- ✅ Chunk caching (IndexedDB)
-- ✅ Asset optimization
-- ✅ Modern ES2015+ build
